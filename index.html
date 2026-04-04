@@ -8,10 +8,10 @@
     <style>
         .active-tab { border-bottom: 4px solid #facc15; font-weight: bold; color: #facc15; }
         .active-table { background: #facc15 !important; color: black; font-weight: bold; transform: scale(1.05); }
-        .receipt-font { font-family: 'Courier New', Courier, monospace; }
-        #admin-modal, #login-overlay { display: none; }
-        /* Show login by default if not authenticated */
+        #admin-modal, #login-overlay, #split-payment-modal { display: none; }
         .not-logged-in #login-overlay { display: flex; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        @media print { .no-print { display: none; } }
     </style>
 </head>
 
@@ -19,62 +19,65 @@
 
 <div id="login-overlay" class="fixed inset-0 bg-gray-950 z-[100] flex flex-col items-center justify-center p-6">
     <div class="bg-white text-black p-8 rounded-3xl shadow-2xl w-full max-w-md text-center">
-        <div class="text-5xl mb-4">🍕</div>
-        <h2 class="text-3xl font-black tracking-tighter mb-2">FOOD MOHALLA</h2>
-        <p class="text-gray-500 mb-8 font-medium">Please login to access POS</p>
-        
+        <div class="text-6xl mb-4">🍕</div>
+        <h2 class="text-3xl font-black tracking-tighter mb-6">FOOD MOHALLA</h2>
         <div class="space-y-4 text-left">
             <div>
-                <label class="text-xs font-bold uppercase text-gray-400 ml-1">Username</label>
-                <input id="login-user" type="text" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-red-500 outline-none transition" placeholder="admin">
+                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Username</label>
+                <input id="login-user" type="text" class="w-full border-2 border-gray-100 p-3 rounded-xl outline-none focus:border-red-500" placeholder="admin">
             </div>
             <div>
-                <label class="text-xs font-bold uppercase text-gray-400 ml-1">Password</label>
-                <input id="login-pass" type="password" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-red-500 outline-none transition" placeholder="••••">
+                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Password</label>
+                <input id="login-pass" type="password" class="w-full border-2 border-gray-100 p-3 rounded-xl outline-none focus:border-red-500" placeholder="••••••••">
             </div>
-            <button onclick="handleLogin()" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-xl shadow-lg shadow-red-200 transition-all active:scale-95">
-                UNLOCK SYSTEM
-            </button>
-            <p id="login-error" class="text-red-500 text-center text-sm font-bold hidden">❌ Invalid Username or Password</p>
+            <button onclick="handleLogin()" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-xl shadow-lg transition-all">UNLOCK SYSTEM</button>
+            <p id="login-error" class="text-red-500 text-center text-sm font-bold hidden mt-2">❌ Invalid Credentials</p>
         </div>
     </div>
-    <p class="mt-8 text-gray-600 text-sm">Authorized Personnel Only</p>
 </div>
 
-<div class="bg-red-700 p-4 flex justify-between items-center shadow-lg">
-    <div class="flex items-center gap-2">
-        <span class="text-3xl">🍕</span><h1 class="text-2xl font-black tracking-tighter">FOOD MOHALLA</h1>
+<div class="bg-red-700 p-3 flex justify-between items-center shadow-lg no-print">
+    <div class="flex items-center gap-3">
+        <span class="text-4xl">🍕</span>
+        <h1 class="text-2xl font-black tracking-tighter italic uppercase text-white">Food Mohalla</h1>
     </div>
     <div class="flex gap-2">
-        <button onclick="logout()" class="bg-black/20 hover:bg-black/30 px-4 py-2 rounded-lg font-bold transition">Logout</button>
-        <button onclick="toggleAdmin()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg font-bold transition">⚙️ Admin & Reports</button>
+        <button onclick="logout()" class="bg-black/20 hover:bg-black/30 px-4 py-2 rounded-lg font-bold transition text-xs">Logout</button>
+        <button onclick="toggleAdmin()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg font-bold transition text-xs">⚙️ Admin</button>
     </div>
 </div>
 
 <div class="flex flex-1 overflow-hidden">
-    <div id="tables" class="w-28 bg-gray-800 p-2 overflow-y-auto border-r border-gray-700 flex flex-col gap-2"></div>
+    <div id="tables" class="w-24 bg-gray-800 p-2 overflow-y-auto border-r border-gray-700 flex flex-col gap-2 no-print"></div>
 
-    <div class="w-96 bg-white text-black flex flex-col shadow-2xl">
+    <div class="w-96 bg-white text-black flex flex-col shadow-2xl no-print">
         <div class="p-4 bg-gray-100 font-bold border-b flex justify-between items-center">
             <span class="text-lg">Table: <span id="table-name" class="text-red-600">--</span></span>
-            <button onclick="clearTable()" class="text-xs text-gray-400 hover:text-red-500 underline">Clear All</button>
+            <button onclick="clearTable()" class="text-xs text-gray-400 hover:text-red-500 underline">Clear</button>
         </div>
         <div id="cart" class="flex-1 p-4 overflow-y-auto space-y-3"></div>
         <div class="p-4 bg-gray-900 text-white">
             <div class="flex justify-between items-center mb-4">
-                <span class="text-gray-400">Grand Total</span>
+                <span class="text-gray-400">Total</span>
                 <span class="text-3xl font-bold text-yellow-400">₹<span id="total">0</span></span>
             </div>
-            <button onclick="kot()" class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-lg font-bold mb-2 transition">Print KOT</button>
-            <div class="grid grid-cols-2 gap-2">
-                <button onclick="bill('Cash')" class="bg-yellow-500 hover:bg-yellow-600 text-black py-3 rounded-lg font-bold transition">💵 Cash</button>
-                <button onclick="bill('Online')" class="bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-bold transition">💳 Online</button>
+            <button onclick="printReceipt('KOT')" class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-lg font-bold mb-2 transition">Print KOT</button>
+            <div class="grid grid-cols-2 gap-2 mb-2">
+                <button onclick="processQuickBill('Cash')" class="bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold transition">💵 Cash</button>
+                <button onclick="processQuickBill('Online')" class="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold transition">💳 Online</button>
             </div>
+            <button onclick="openSplitModal()" class="w-full border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white py-2 rounded-lg font-bold transition text-xs">Split Cash + Online</button>
         </div>
     </div>
 
-    <div class="flex-1 flex flex-col bg-gray-100 text-black">
-        <div id="cats" class="flex gap-4 p-4 bg-white shadow-sm overflow-x-auto scrollbar-hide"></div>
+    <div class="flex-1 flex flex-col bg-gray-100 text-black no-print">
+        <div class="bg-white shadow-sm p-4 border-b">
+            <div id="cats" class="flex gap-4 overflow-x-auto scrollbar-hide whitespace-nowrap px-2 mb-3"></div>
+            <div class="relative w-full">
+                <span class="absolute left-3 top-2 text-gray-400">🔍</span>
+                <input id="menu-search" type="text" oninput="renderMenu()" placeholder="Type item name..." class="w-full pl-9 pr-4 py-2 border-2 border-gray-100 rounded-xl focus:border-red-500 outline-none transition text-sm">
+            </div>
+        </div>
         <div id="menu" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-6 overflow-y-auto"></div>
     </div>
 </div>
@@ -83,68 +86,55 @@
     <div class="bg-white text-black w-full max-w-4xl max-h-[90vh] rounded-2xl overflow-hidden flex flex-col">
         <div class="p-4 bg-gray-800 text-white flex justify-between items-center">
             <h2 class="text-xl font-bold">Admin Dashboard</h2>
-            <button onclick="toggleAdmin()" class="text-2xl">&times;</button>
+            <button onclick="toggleAdmin()" class="text-2xl hover:text-red-500">&times;</button>
         </div>
         <div class="flex flex-1 overflow-hidden">
             <div class="w-48 bg-gray-100 border-r p-4 flex flex-col gap-2">
-                <button onclick="showAdminSection('editor')" class="text-left p-2 rounded hover:bg-gray-200 font-bold">➕ Add/Edit Menu</button>
-                <button onclick="showAdminSection('reports')" class="text-left p-2 rounded hover:bg-gray-200 font-bold">📊 Daily Report</button>
+                <button onclick="verifyOwnerAndShow('editor')" class="text-left p-3 rounded-lg hover:bg-gray-200 font-bold transition">➕ Add/Edit Menu</button>
+                <button onclick="showAdminSection('reports')" class="text-left p-3 rounded-lg hover:bg-gray-200 font-bold transition">📊 Sales History</button>
             </div>
             <div class="flex-1 p-6 overflow-y-auto">
-                <div id="section-editor" class="admin-section">
-                    <h3 class="text-lg font-bold mb-4">Add New Item</h3>
-                    <div class="grid grid-cols-2 gap-4 mb-8 p-4 border rounded-xl">
-                        <input id="new-name" placeholder="Item Name" class="border p-2 rounded">
-                        <select id="new-cat" class="border p-2 rounded"></select>
-                        <input id="new-price" type="number" placeholder="Price" class="border p-2 rounded">
-                        <input id="new-img" placeholder="Image URL (Optional)" class="border p-2 rounded">
-                        <button onclick="addItem()" class="col-span-2 bg-green-600 text-white py-2 rounded-lg font-bold">Save to Menu</button>
+                <div id="section-editor" class="admin-section hidden">
+                    <h3 class="text-lg font-bold mb-4 text-red-600 border-b pb-2">Edit Menu</h3>
+                    <div class="grid grid-cols-2 gap-4 mb-8 p-4 border rounded-xl bg-gray-50">
+                        <input id="new-name" placeholder="Item Name" class="border p-2 rounded"><select id="new-cat" class="border p-2 rounded"></select>
+                        <input id="new-price" type="number" placeholder="Price" class="border p-2 rounded"><input id="new-img" placeholder="Image URL" class="border p-2 rounded">
+                        <button onclick="addItem()" class="col-span-2 bg-green-600 text-white py-2 rounded-lg font-bold">Save Item</button>
                     </div>
                     <div id="inventory-list" class="space-y-2"></div>
                 </div>
                 <div id="section-reports" class="admin-section hidden">
-                    <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">Sales History</h3><button onclick="clearReports()" class="text-red-500 text-sm italic">Clear All History</button></div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold">Daily Register</h3>
+                        <div class="flex gap-2">
+                            <button onclick="exportToExcel(false)" class="bg-blue-600 text-white px-3 py-1 rounded text-xs font-bold">📥 Download Excel</button>
+                            <button onclick="closeRegister()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold">🔒 Close Register (End Day)</button>
+                        </div>
+                    </div>
                     <div id="report-stats" class="grid grid-cols-3 gap-4 mb-6"></div>
-                    <div id="report-list" class="space-y-2"></div>
+                    <div id="report-list" class="space-y-1"></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<div id="split-payment-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4">
+    <div class="bg-white text-black p-6 rounded-2xl w-full max-w-sm">
+        <h3 class="text-xl font-bold mb-4">Split Payment</h3>
+        <div class="space-y-4">
+            <div class="bg-gray-100 p-3 rounded-lg flex justify-between"><span>Bill Total:</span><span class="font-bold text-red-600">₹<span id="split-total-display">0</span></span></div>
+            <input id="split-cash" type="number" oninput="calculateSplit()" class="w-full border-2 p-3 rounded-lg font-bold" placeholder="Enter Cash Amount">
+            <input id="split-online" type="number" readonly class="w-full border-2 bg-blue-50 p-3 rounded-lg font-bold text-blue-600" placeholder="Online Portion">
+            <div class="flex gap-2 pt-4"><button onclick="closeSplitModal()" class="flex-1 bg-gray-200 py-3 rounded-lg font-bold">Back</button><button onclick="submitSplitPayment()" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold">Complete Sale</button></div>
+        </div>
+    </div>
+</div>
+
+<iframe id="print-frame" style="display:none;"></iframe>
+
 <script>
-// --- AUTHENTICATION LOGIC ---
-const AUTH_CONFIG = {
-    user: "Pranil",
-    pass: "pranil123" // CHANGE YOUR PASSWORD HERE
-};
-
-function handleLogin() {
-    const u = document.getElementById("login-user").value;
-    const p = document.getElementById("login-pass").value;
-    const errorMsg = document.getElementById("login-error");
-
-    if(u === AUTH_CONFIG.user && p === AUTH_CONFIG.pass) {
-        sessionStorage.setItem("fm_authenticated", "true");
-        document.body.classList.remove("not-logged-in");
-        errorMsg.classList.add("hidden");
-    } else {
-        errorMsg.classList.remove("hidden");
-    }
-}
-
-function checkAuth() {
-    if(sessionStorage.getItem("fm_authenticated") === "true") {
-        document.body.classList.remove("not-logged-in");
-    }
-}
-
-function logout() {
-    sessionStorage.removeItem("fm_authenticated");
-    location.reload();
-}
-
-// --- YOUR ORIGINAL DATA & LOGIC ---
+const AUTH_CONFIG = { user: "admin", pass: "admin123", ownerPass: "owner789" };
 const TABLES = ["T1","T2","T3","T4","T5","T6","T7","T8","P-1","P-2"];
 const CATEGORIES = ["Pizza","Burger","Burgizza","Sandwich","Fries","Garlic Bread","Bite Buddies","Pasta","Combo","Mocktails","Sip & Chill"];
 
@@ -156,6 +146,115 @@ let sales = JSON.parse(localStorage.getItem("fm_sales")) || [];
 
 TABLES.forEach(t => { if(!tables[t]) tables[t] = [] });
 
+function handleLogin() {
+    const u = document.getElementById("login-user").value;
+    const p = document.getElementById("login-pass").value;
+    if(u === AUTH_CONFIG.user && p === AUTH_CONFIG.pass) {
+        sessionStorage.setItem("fm_auth", "true");
+        document.body.classList.remove("not-logged-in");
+        initSystem();
+    } else { document.getElementById("login-error").classList.remove("hidden"); }
+}
+
+function initSystem() { renderTables(); renderCats(); renderMenu(); renderCart(); }
+
+function verifyOwnerAndShow(section) {
+    const p = prompt("OWNER AUTH REQUIRED:");
+    if(p === AUTH_CONFIG.ownerPass) { showAdminSection(section); renderInventory(); }
+    else { alert("Unauthorized!"); }
+}
+
+// --- END OF DAY: CLOSE REGISTER LOGIC ---
+function exportToExcel(isClosing = false) {
+    if (sales.length === 0) {
+        if(!isClosing) alert("No sales to export!");
+        return false;
+    }
+    
+    let csv = "Date,Time,Table,Total Bill,Cash Paid,Online Paid,Payment Mode\n";
+    sales.forEach(s => {
+        csv += `${s.date},${s.time_only},${s.table},${s.total},${s.cash},${s.online},${s.mode}\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    const filename = isClosing ? `CLOSING_REPORT_${new Date().toLocaleDateString().replace(/\//g,'-')}.csv` : `Sales_Report_${new Date().toLocaleDateString()}.csv`;
+    a.setAttribute('download', filename);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    return true;
+}
+
+function closeRegister() {
+    if (sales.length === 0) return alert("Register is already empty!");
+    
+    if (confirm("Kya aap aaj ka register close karna chahte hain? \n\n1. Excel sheet download hogi. \n2. Aaj ki history clear ho jayegi taaki kal naya hisab shuru ho sake.")) {
+        const success = exportToExcel(true);
+        if (success) {
+            sales = [];
+            save();
+            renderReports();
+            alert("Register Closed! Hisab Excel mein save ho gaya hai.");
+        }
+    }
+}
+
+function processFinalSale(saleData) {
+    const now = new Date();
+    const fullSale = { 
+        id: Date.now(), 
+        date: now.toLocaleDateString(), 
+        time_only: now.toLocaleTimeString(),
+        table: activeTable, 
+        ...saleData 
+    };
+    printReceipt('BILL', fullSale);
+    sales.push(fullSale);
+    save(); 
+    tables[activeTable] = [];
+    renderCart(); renderTables();
+}
+
+function renderMenu(){
+    const query = document.getElementById("menu-search").value.toLowerCase();
+    let items = menu.filter(m => m.category === activeCat);
+    if(query) items = items.filter(m => m.name.toLowerCase().includes(query));
+    document.getElementById("menu").innerHTML = items.map(m=>`<div onclick="addCart(${m.id})" class="bg-white p-3 rounded-2xl shadow-sm border active:scale-95 transition cursor-pointer"><div class="h-24 bg-gray-100 rounded-xl mb-2 overflow-hidden"><img src="${m.img || 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200'}" class="w-full h-full object-cover"></div><h3 class="font-bold text-xs truncate">${m.name}</h3><p class="text-red-600 font-black text-sm">₹${m.price}</p></div>`).join("");
+}
+
+function calculateSplit() {
+    const total = parseInt(document.getElementById("split-total-display").innerText);
+    const cash = parseInt(document.getElementById("split-cash").value) || 0;
+    document.getElementById("split-online").value = Math.max(0, total - cash);
+}
+
+function submitSplitPayment() {
+    const total = parseInt(document.getElementById("split-total-display").innerText);
+    const cash = parseInt(document.getElementById("split-cash").value) || 0;
+    const online = parseInt(document.getElementById("split-online").value) || 0;
+    if((cash + online) !== total) return alert("Amount mismatch!");
+    processFinalSale({ total, cash, online, mode: "Split" });
+    closeSplitModal();
+}
+
+function printReceipt(type, saleData = null) {
+    const cart = tables[activeTable];
+    const total = saleData ? saleData.total : cart.reduce((sum, i) => sum + (i.price*i.qty), 0);
+    let html = `<div style="font-family:monospace;width:70mm;font-size:12px;"><center><span style="font-size:24px">🍕</span><br><b>FOOD MOHALLA</b><br>${type==='KOT'?'KOT':'BILL'}<br>Tbl:${activeTable}</center><hr>${cart.map(i => `<div>${i.name} x${i.qty}</div>`).join('')}<hr>${type !== 'KOT' ? `TOTAL: ₹${total}<br>Mode: ${saleData.mode}` : ''}</div>`;
+    const frame = document.getElementById('print-frame');
+    frame.contentWindow.document.open(); frame.contentWindow.document.write(`<html><body onload="window.print()">${html}</body></html>`); frame.contentWindow.document.close();
+}
+
+function processQuickBill(mode) {
+    const total = parseInt(document.getElementById("total").innerText);
+    if(total <= 0) return alert("Cart empty");
+    processFinalSale({ total, cash: mode==='Cash'?total:0, online: mode==='Online'?total:0, mode });
+}
+
 function save() {
     localStorage.setItem("fm_menu", JSON.stringify(menu));
     localStorage.setItem("fm_tables", JSON.stringify(tables));
@@ -163,139 +262,49 @@ function save() {
 }
 
 function renderTables(){
-    document.getElementById("tables").innerHTML = TABLES.map(t=>`
-        <button onclick="setTable('${t}')" class="w-full py-4 rounded-xl transition text-sm ${t===activeTable?'active-table':'bg-gray-700 text-gray-300 hover:bg-gray-600'}">
-            ${t}
-            ${tables[t].length > 0 ? '<div class="text-[10px] text-red-400 mt-1">● Occupied</div>' : ''}
-        </button>`).join("");
+    document.getElementById("tables").innerHTML = TABLES.map(t=>`<button onclick="setTable('${t}')" class="w-full py-4 rounded-xl transition text-sm ${t===activeTable?'active-table':'bg-gray-700 text-gray-300'}">${t}${tables[t].length > 0 ? ' ●' : ''}</button>`).join("");
     document.getElementById("table-name").innerText = activeTable;
 }
 
 function renderCats(){
-    document.getElementById("cats").innerHTML = CATEGORIES.map(c=>`
-        <button onclick="setCat('${c}')" class="pb-2 transition-all ${c===activeCat?'active-tab':'text-gray-400 hover:text-black'} font-bold whitespace-nowrap">
-            ${c}
-        </button>`).join("");
+    document.getElementById("cats").innerHTML = CATEGORIES.map(c=>`<button onclick="setCat('${c}')" class="pb-2 transition-all ${c===activeCat?'active-tab':'text-gray-400'} font-bold uppercase text-xs">${c}</button>`).join("");
     document.getElementById("new-cat").innerHTML = CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join("");
 }
 
-function renderMenu(){
-    let items = menu.filter(m=>m.category===activeCat);
-    document.getElementById("menu").innerHTML = items.map(m=>`
-        <div onclick="addCart(${m.id})" class="bg-white p-3 rounded-2xl shadow-sm hover:shadow-md cursor-pointer transition transform active:scale-95 border border-transparent hover:border-red-200">
-            <div class="h-32 bg-gray-100 rounded-xl mb-3 overflow-hidden">
-                <img src="${m.img || 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200'}" class="w-full h-full object-cover">
-            </div>
-            <h3 class="font-bold text-gray-800 truncate">${m.name}</h3>
-            <p class="text-red-600 font-black">₹${m.price}</p>
-        </div>`).join("");
+function renderCart(){
+    let cart = tables[activeTable]; let total = 0;
+    document.getElementById("cart").innerHTML = cart.length === 0 ? '<div class="text-center mt-20 italic">Empty</div>' :
+        cart.map(i=>{ total += i.price*i.qty; return `<div class="flex justify-between text-sm mb-3 font-bold"><span>${i.name} x${i.qty}</span><span>₹${i.price*i.qty}</span></div>`; }).join("");
+    document.getElementById("total").innerText = total;
 }
 
-function renderCart(){
-    let cart = tables[activeTable];
-    let total = 0;
-    document.getElementById("cart").innerHTML = cart.length === 0 ? 
-        '<div class="h-full flex flex-col items-center justify-center text-gray-300"><span class="text-4xl">🛒</span><p>Cart is empty</p></div>' :
-        cart.map(i=>{
-            total += i.price*i.qty;
-            return `
-            <div class="flex items-center justify-between group">
-                <div class="flex-1"><h4 class="font-bold text-sm">${i.name}</h4><span class="text-xs text-gray-500">₹${i.price} / unit</span></div>
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center bg-gray-100 rounded-lg p-1">
-                        <button onclick="dec(${i.id})" class="w-6 h-6 bg-white rounded shadow text-red-500">-</button>
-                        <span class="w-8 text-center font-bold">${i.qty}</span>
-                        <button onclick="inc(${i.id})" class="w-6 h-6 bg-white rounded shadow text-green-500">+</button>
-                    </div>
-                    <span class="w-16 text-right font-bold">₹${i.price*i.qty}</span>
-                </div>
-            </div>`;
-        }).join("");
-    document.getElementById("total").innerText = total;
+function addCart(id){
+    let item = menu.find(m=>m.id==id); let cart = tables[activeTable]; let exist = cart.find(i=>i.id==id);
+    if(exist) exist.qty++; else cart.push({...item, qty:1});
+    save(); renderCart(); renderTables();
 }
 
 function setTable(t){ activeTable=t; renderTables(); renderCart(); }
 function setCat(c){ activeCat=c; renderCats(); renderMenu(); }
-
-function addCart(id){
-    let item = menu.find(m=>m.id==id);
-    let cart = tables[activeTable];
-    let exist = cart.find(i=>i.id==id);
-    if(exist) exist.qty++;
-    else cart.push({...item, qty:1});
-    save(); renderCart(); renderTables();
-}
-
-function inc(id){ tables[activeTable].find(i=>i.id==id).qty++; save(); renderCart(); }
-function dec(id){
-    let cart = tables[activeTable];
-    let i = cart.findIndex(x=>x.id==id);
-    if(cart[i].qty>1) cart[i].qty--;
-    else cart.splice(i,1);
-    save(); renderCart(); renderTables();
-}
-
-function clearTable(){ if(confirm("Clear this table?")) { tables[activeTable] = []; save(); renderCart(); renderTables(); } }
-
-function kot(){
-    let cart = tables[activeTable];
-    if(cart.length==0) return alert("Cart is empty");
-    let w = window.open('','','width=400,height=600');
-    w.document.write(`<html><body onload="window.print(); window.close();" style="font-family:monospace;width:80mm"><h3>KOT: ${activeTable}</h3><hr>${cart.map(i => `<div>${i.name} x${i.qty}</div>`).join("")}</body></html>`);
-}
-
-function bill(mode){
-    let cart = tables[activeTable];
-    if(cart.length==0) return alert("Cart is empty");
-    let total = cart.reduce((sum, i) => sum + (i.price*i.qty), 0);
-    sales.push({ id: Date.now(), date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString(), table: activeTable, items: [...cart], total: total, mode: mode });
-    let w = window.open('','','width=400,height=800');
-    w.document.write(`<html><body onload="window.print(); window.close();" style="font-family:monospace;width:80mm"><center><h2>FOOD MOHALLA</h2><p>${new Date().toLocaleString()}</p></center><hr>${cart.map(i => `<div style="display:flex;justify-content:space-between"><span>${i.name} x${i.qty}</span><span>₹${i.price*i.qty}</span></div>`).join("")}<hr><div style="display:flex;justify-content:space-between;font-weight:bold"><span>TOTAL:</span><span>₹${total}</span></div></body></html>`);
-    tables[activeTable]=[]; save(); renderCart(); renderTables();
-}
-
-function toggleAdmin(){
-    const modal = document.getElementById("admin-modal");
-    modal.style.display = modal.style.display === "flex" ? "none" : "flex";
-    if(modal.style.display === "flex") { showAdminSection('editor'); renderInventory(); }
-}
-
-function showAdminSection(id){
-    document.querySelectorAll('.admin-section').forEach(s => s.classList.add('hidden'));
-    document.getElementById('section-' + id).classList.remove('hidden');
-    if(id === 'reports') renderReports();
-}
-
-function addItem(){
-    let name = document.getElementById("new-name").value;
-    let cat = document.getElementById("new-cat").value;
-    let price = document.getElementById("new-price").value;
-    let img = document.getElementById("new-img").value;
-    if(!name || !price) return alert("Fill Name and Price");
-    menu.push({ id: Date.now(), name, category: cat, price: parseFloat(price), img });
-    save(); renderMenu(); renderInventory();
-    document.getElementById("new-name").value = ""; document.getElementById("new-price").value = "";
-}
-
-function deleteMenu(id){ if(confirm("Remove this item?")){ menu = menu.filter(m => m.id !== id); save(); renderMenu(); renderInventory(); } }
-
-function renderInventory(){
-    document.getElementById("inventory-list").innerHTML = menu.map(m=>`
-        <div class="flex justify-between items-center p-2 bg-gray-50 rounded border"><span><strong>${m.name}</strong> (${m.category}) - ₹${m.price}</span><button onclick="deleteMenu(${m.id})" class="text-red-500">Delete</button></div>`).join("");
-}
+function logout() { sessionStorage.clear(); location.reload(); }
+function toggleAdmin(){ const m = document.getElementById("admin-modal"); m.style.display = m.style.display === "flex" ? "none" : "flex"; }
+function showAdminSection(id){ document.querySelectorAll('.admin-section').forEach(s => s.classList.add('hidden')); document.getElementById('section-' + id).classList.remove('hidden'); if(id === 'reports') renderReports(); }
+function clearTable(){ if(confirm("Clear?")) { tables[activeTable] = []; save(); renderCart(); renderTables(); } }
+function addItem(){ let name = document.getElementById("new-name").value; let price = document.getElementById("new-price").value; if(!name || !price) return; menu.push({ id: Date.now(), name, category: document.getElementById("new-cat").value, price: parseFloat(price), img: document.getElementById("new-img").value }); save(); renderMenu(); renderInventory(); }
+function renderInventory(){ document.getElementById("inventory-list").innerHTML = menu.map(m=>`<div class="flex justify-between p-2 border rounded bg-white text-xs mb-1"><span>${m.name} (₹${m.price})</span><button onclick="deleteMenu(${m.id})" class="text-red-500">Delete</button></div>`).join(""); }
+function deleteMenu(id){ if(confirm("Delete?")){ menu = menu.filter(m => m.id !== id); save(); renderMenu(); renderInventory(); } }
 
 function renderReports(){
-    let totalSales = sales.reduce((a,b)=>a+b.total, 0);
-    let cash = sales.filter(s=>s.mode==='Cash').reduce((a,b)=>a+b.total, 0);
-    let online = sales.filter(s=>s.mode==='Online').reduce((a,b)=>a+b.total, 0);
-    document.getElementById("report-stats").innerHTML = `<div class="p-4 bg-green-100 rounded-xl text-green-800"><p class="text-sm">Total Sales</p><h4 class="text-2xl font-bold">₹${totalSales}</h4></div><div class="p-4 bg-yellow-100 rounded-xl text-yellow-800"><p class="text-sm">Cash</p><h4 class="text-2xl font-bold">₹${cash}</h4></div><div class="p-4 bg-blue-100 rounded-xl text-blue-800"><p class="text-sm">Online</p><h4 class="text-2xl font-bold">₹${online}</h4></div>`;
-    document.getElementById("report-list").innerHTML = sales.slice().reverse().map(s=>`<div class="p-3 border-b text-sm flex justify-between"><div><strong>${s.time}</strong> - ${s.table} (${s.mode})</div><div class="font-bold">₹${s.total}</div></div>`).join("");
+    let totalCash = sales.reduce((a,b)=>a+(b.cash||0), 0);
+    let totalOnline = sales.reduce((a,b)=>a+(b.online||0), 0);
+    document.getElementById("report-stats").innerHTML = `<div class="p-4 bg-green-50 rounded-xl text-center border font-bold">Total: ₹${totalCash + totalOnline}</div><div class="p-4 bg-yellow-50 rounded-xl text-center border font-bold">Cash: ₹${totalCash}</div><div class="p-4 bg-blue-50 rounded-xl text-center border font-bold">Online: ₹${totalOnline}</div>`;
+    document.getElementById("report-list").innerHTML = sales.slice().reverse().map(s=>`<div class="text-[10px] p-2 border-b flex justify-between bg-white"><span>${s.date} ${s.time_only}<br>Tbl:${s.table}</span><span class="text-right font-bold">₹${s.total} (${s.mode})</span></div>`).join("");
 }
 
-function clearReports(){ if(confirm("This will delete all sales history. Continue?")){ sales = []; save(); renderReports(); } }
+function openSplitModal() { const total = parseInt(document.getElementById("total").innerText); if(total <= 0) return; document.getElementById("split-total-display").innerText = total; document.getElementById("split-cash").value = ""; document.getElementById("split-online").value = total; document.getElementById("split-payment-modal").style.display = "flex"; }
+function closeSplitModal() { document.getElementById("split-payment-modal").style.display = "none"; }
 
-// INIT
-checkAuth(); renderTables(); renderCats(); renderMenu(); renderCart();
+if(sessionStorage.getItem("fm_auth") === "true") { document.body.classList.remove("not-logged-in"); initSystem(); }
 </script>
 </body>
 </html>
