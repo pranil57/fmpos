@@ -18,13 +18,13 @@
 
 <div id="login-overlay" class="fixed inset-0 bg-gray-950 z-[1000] flex flex-col items-center justify-center p-6">
     <div class="bg-white text-black p-8 rounded-3xl shadow-2xl w-full max-w-md text-center">
-        <div class="text-6xl mb-4">🍕</div>
+        <div class="text-6xl mb-4">&#127829;</div>
         <h2 class="text-3xl font-black tracking-tighter mb-6">FOOD MOHALLA</h2>
         <div class="space-y-4 text-left">
             <input id="login-user" type="text" class="w-full border-2 p-3 rounded-xl outline-none focus:border-red-500" placeholder="Username" autocomplete="off">
             <input id="login-pass" type="password" class="w-full border-2 p-3 rounded-xl outline-none focus:border-red-500" placeholder="Password" autocomplete="off">
             <button onclick="handleLogin()" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-xl shadow-lg transition-all active:scale-95">UNLOCK SYSTEM</button>
-            <p id="login-error" class="text-red-500 text-center text-sm font-bold hidden mt-2">❌ Invalid Login</p>
+            <p id="login-error" class="text-red-500 text-center text-sm font-bold hidden mt-2">&#10060; Invalid Login</p>
         </div>
     </div>
 </div>
@@ -32,12 +32,12 @@
 <div id="main-app" class="flex-col h-full">
     <div class="bg-red-700 p-3 flex justify-between items-center shadow-lg no-print">
         <div class="flex items-center gap-3">
-            <span class="text-4xl">🍕</span>
+            <span class="text-4xl">&#127829;</span>
             <h1 class="text-2xl font-black tracking-tighter italic uppercase text-white">Food Mohalla</h1>
         </div>
         <div class="flex gap-2">
             <button onclick="logout()" class="bg-black/20 hover:bg-black/30 px-4 py-2 rounded-lg font-bold transition text-xs">Logout</button>
-            <button onclick="toggleAdmin()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg font-bold transition text-xs">⚙️ Admin</button>
+            <button onclick="toggleAdmin()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg font-bold transition text-xs">&#9881;&#65039; Admin</button>
         </div>
     </div>
 
@@ -50,16 +50,16 @@
                 <button onclick="clearTable()" class="text-xs text-gray-400 hover:text-red-500 underline">Clear</button>
             </div>
             <div id="cart" class="flex-1 p-4 overflow-y-auto space-y-3"></div>
-            
+
             <div class="p-4 bg-gray-900 text-white">
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-gray-400">Total</span>
-                    <span class="text-3xl font-bold text-yellow-400">₹<span id="total">0</span></span>
+                    <span class="text-3xl font-bold text-yellow-400">&#8377;<span id="total">0</span></span>
                 </div>
-                <button onclick="printReceipt('KOT')" class="w-full bg-indigo-600 hover:bg-indigo-700 py-3 rounded-lg font-bold mb-2 shadow-md">🖨️ PRINT KOT</button>
+                <button onclick="printReceipt('KOT')" class="w-full bg-indigo-600 hover:bg-indigo-700 py-3 rounded-lg font-bold mb-2 shadow-md">&#128424;&#65039; PRINT KOT</button>
                 <div class="grid grid-cols-2 gap-2 mb-2">
-                    <button onclick="processQuickBill('Cash')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg font-bold shadow-md">💵 CASH</button>
-                    <button onclick="processQuickBill('Online')" class="bg-sky-600 hover:bg-sky-700 text-white py-3 rounded-lg font-bold shadow-md">💳 ONLINE</button>
+                    <button onclick="processQuickBill('Cash')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg font-bold shadow-md">&#128176; CASH</button>
+                    <button onclick="processQuickBill('Online')" class="bg-sky-600 hover:bg-sky-700 text-white py-3 rounded-lg font-bold shadow-md">&#128179; ONLINE</button>
                 </div>
                 <button onclick="openSplitModal()" class="w-full border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white py-2 rounded-lg font-bold transition text-xs uppercase">Split (Cash + Online)</button>
             </div>
@@ -69,7 +69,7 @@
             <div class="bg-white shadow-sm p-4 border-b">
                 <div id="cats" class="flex gap-4 overflow-x-auto scrollbar-hide whitespace-nowrap px-2 mb-3"></div>
                 <div class="relative w-full">
-                    <span class="absolute left-3 top-2 text-gray-400">🔍</span>
+                    <span class="absolute left-3 top-2 text-gray-400">&#128269;</span>
                     <input id="menu-search" type="text" oninput="renderMenu()" placeholder="Search items..." class="w-full pl-9 pr-4 py-2 border-2 border-gray-100 rounded-xl focus:border-red-500 outline-none text-sm">
                 </div>
             </div>
@@ -81,6 +81,9 @@
 <div id="split-payment-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[2000] p-4 text-black">
     <div class="bg-white p-6 rounded-2xl w-full max-w-sm">
         <h3 class="text-xl font-bold mb-4 border-b pb-2">Split Bill</h3>
+        <div class="mb-4 rounded-lg bg-orange-50 border border-orange-200 px-4 py-3 font-bold text-orange-700">
+            Total: &#8377;<span id="split-total-display">0</span>
+        </div>
         <input id="split-cash" type="number" oninput="calculateSplit()" class="w-full border-2 p-3 rounded-lg font-bold mb-3" placeholder="Cash Amount">
         <input id="split-online" type="number" readonly class="w-full border-2 bg-blue-50 p-3 rounded-lg font-bold text-blue-600 mb-4" placeholder="Online Amount">
         <div class="flex gap-2">
@@ -115,7 +118,7 @@
                 <div id="section-reports" class="admin-section hidden">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-bold">Sales</h3>
-                        <button onclick="closeRegister()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold">🔒 CLOSE REGISTER (EXCEL)</button>
+                        <button onclick="closeRegister()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold">&#128274; CLOSE REGISTER (EXCEL)</button>
                     </div>
                     <div id="report-stats" class="grid grid-cols-3 gap-4 mb-6"></div>
                     <div id="report-list" class="space-y-1"></div>
@@ -129,20 +132,56 @@
 
 <script>
 const AUTH_CONFIG = { user: "admin", pass: "admin123", ownerPass: "owner789" };
-const TABLES = ["T1","T2","T3","T4","T5","T6","T7","T8","P-1","P-2"];
-const CATEGORIES = ["Pizza","Burger","Burgizza","Sandwich","Fries","Garlic Bread","Bite Buddies","Pasta","Combo","Mocktails","Sip & Chill"];
+const TABLES = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "P-1", "P-2"];
+const CATEGORIES = ["PIZZA", "PIZZA SIDES", "BURGER", "PASTA", "BURGIZZA", "SANDWICH", "FRY-O-CLOCK", "BITE BUDDIES", "MOCKTAILS", "SIP & CHILL", "SIZZLING & SWEET"];
 
-let activeTable = "T1"; let activeCat = "Pizza";
-let menu = JSON.parse(localStorage.getItem("fm_menu")) || [];
+let defaultMenu = [
+    { id: 1, name: "Single Cheese (R)", category: "PIZZA", price: 119, img: "https://images.unsplash.com/photo-1593560704563-f176a2eb61db?q=80&w=200&auto=format&fit=crop" },
+    { id: 2, name: "Single Cheese (M)", category: "PIZZA", price: 259, img: "https://images.unsplash.com/photo-1593560704563-f176a2eb61db?q=80&w=200&auto=format&fit=crop" },
+    { id: 3, name: "Single Cheese (L)", category: "PIZZA", price: 379, img: "https://images.unsplash.com/photo-1593560704563-f176a2eb61db?q=80&w=200&auto=format&fit=crop" },
+    { id: 4, name: "Double Cheese (R)", category: "PIZZA", price: 149, img: "https://images.unsplash.com/photo-1594179047519-f347310d3322?q=80&w=200&auto=format&fit=crop" },
+    { id: 5, name: "Double Cheese (M)", category: "PIZZA", price: 319, img: "https://images.unsplash.com/photo-1594179047519-f347310d3322?q=80&w=200&auto=format&fit=crop" },
+    { id: 6, name: "Double Cheese (L)", category: "PIZZA", price: 429, img: "https://images.unsplash.com/photo-1594179047519-f347310d3322?q=80&w=200&auto=format&fit=crop" },
+    { id: 7, name: "Classic Veggie (R)", category: "PIZZA", price: 189, img: "https://images.unsplash.com/photo-1574126154517-d1e0d89ef734?q=80&w=200&auto=format&fit=crop" },
+    { id: 8, name: "Classic Veggie (M)", category: "PIZZA", price: 349, img: "https://images.unsplash.com/photo-1574126154517-d1e0d89ef734?q=80&w=200&auto=format&fit=crop" },
+    { id: 9, name: "Classic Veggie (L)", category: "PIZZA", price: 489, img: "https://images.unsplash.com/photo-1574126154517-d1e0d89ef734?q=80&w=200&auto=format&fit=crop" },
+    { id: 10, name: "Supreme Americano Cheese Burst (R)", category: "PIZZA", price: 79, img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=200&auto=format&fit=crop" },
+    { id: 11, name: "Supreme Americano Cheese Burst (M)", category: "PIZZA", price: 129, img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=200&auto=format&fit=crop" },
+    { id: 12, name: "Supreme Americano Cheese Burst (L)", category: "PIZZA", price: 179, img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=200&auto=format&fit=crop" },
+    { id: 13, name: "Regular Garlic Bread", category: "PIZZA SIDES", price: 69, img: "https://images.unsplash.com/photo-1619531659550-881af319de01?q=80&w=200&auto=format&fit=crop" },
+    { id: 14, name: "Cheese Garlic Bread", category: "PIZZA SIDES", price: 89, img: "https://images.unsplash.com/photo-1619531659550-881af319de01?q=80&w=200&auto=format&fit=crop" },
+    { id: 15, name: "Stuffed Cheesy Garlic Sticks", category: "PIZZA SIDES", price: 109, img: "https://images.unsplash.com/photo-1619531659550-881af319de01?q=80&w=200&auto=format&fit=crop" },
+    { id: 16, name: "Aloo Tikki Burger", category: "BURGER", price: 69, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=200&auto=format&fit=crop" },
+    { id: 17, name: "Classic Burger", category: "BURGER", price: 79, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=200&auto=format&fit=crop" },
+    { id: 18, name: "Double Decker Burger", category: "BURGER", price: 149, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=200&auto=format&fit=crop" },
+    { id: 19, name: "Arrabbiata Pasta", category: "PASTA", price: 179, img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=200&auto=format&fit=crop" },
+    { id: 20, name: "Alfredo Pasta", category: "PASTA", price: 199, img: "https://images.unsplash.com/photo-1608219992759-8d74ed8d76eb?q=80&w=200&auto=format&fit=crop" },
+    { id: 21, name: "Onion Paneer Burgizza", category: "BURGIZZA", price: 89, img: "https://images.unsplash.com/photo-1619531659550-881af319de01?q=80&w=200&auto=format&fit=crop" },
+    { id: 22, name: "Veg. Cheese Sandwich", category: "SANDWICH", price: 99, img: "https://images.unsplash.com/photo-1592415499556-74fcb9f18667?q=80&w=200&auto=format&fit=crop" },
+    { id: 23, name: "Classic Fries", category: "FRY-O-CLOCK", price: 69, img: "https://images.unsplash.com/photo-1573080493109-dbdd990dbf8b?q=80&w=200&auto=format&fit=crop" },
+    { id: 24, name: "Potato Wedges (100gm)", category: "BITE BUDDIES", price: 79, img: "https://images.unsplash.com/photo-1623238914276-0852d213840e?q=80&w=200&auto=format&fit=crop" },
+    { id: 25, name: "Mint Mojito", category: "MOCKTAILS", price: 119, img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=200&auto=format&fit=crop" },
+    { id: 26, name: "Cold Coffee", category: "SIP & CHILL", price: 79, img: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?q=80&w=200&auto=format&fit=crop" },
+    { id: 27, name: "Kitkat Shake", category: "SIP & CHILL", price: 149, img: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?q=80&w=200&auto=format&fit=crop" },
+    { id: 28, name: "Chocolava", category: "SIZZLING & SWEET", price: 79, img: "https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?q=80&w=200&auto=format&fit=crop" }
+];
+
+let activeTable = TABLES[0];
+let activeCat = CATEGORIES[0];
+let menu = JSON.parse(localStorage.getItem("fm_menu")) || defaultMenu;
 let tables = JSON.parse(localStorage.getItem("fm_tables")) || {};
 let sales = JSON.parse(localStorage.getItem("fm_sales")) || [];
-TABLES.forEach(t => { if(!tables[t]) tables[t] = [] });
 
-// FIXED LOGIN LOGIC
+TABLES.forEach((table) => {
+    if (!tables[table]) tables[table] = [];
+});
+
 function handleLogin() {
     const u = document.getElementById("login-user").value.trim();
     const p = document.getElementById("login-pass").value.trim();
-    if(u === AUTH_CONFIG.user && p === AUTH_CONFIG.pass) {
+
+    if (u === AUTH_CONFIG.user && p === AUTH_CONFIG.pass) {
+        document.getElementById("login-error").classList.add("hidden");
         unlockApp();
     } else {
         document.getElementById("login-error").classList.remove("hidden");
@@ -156,7 +195,12 @@ function unlockApp() {
     initSystem();
 }
 
-function initSystem() { renderTables(); renderCats(); renderMenu(); renderCart(); }
+function initSystem() {
+    renderTables();
+    renderCats();
+    renderMenu();
+    renderCart();
+}
 
 function logout() {
     sessionStorage.removeItem("fm_auth");
@@ -164,80 +208,157 @@ function logout() {
 }
 
 function renderCart() {
-    let cart = tables[activeTable]; let total = 0;
-    document.getElementById("cart").innerHTML = cart.length === 0 ? '<div class="text-center mt-20 text-gray-300 italic">No Items</div>' :
-        cart.map(i => {
-            total += i.price * i.qty;
-            return `<div class="flex justify-between items-center border-b pb-2"><div class="flex-1 font-bold text-sm">${i.name}</div><div class="flex items-center gap-3"><div class="flex items-center bg-gray-100 rounded-lg"><button onclick="dec(${i.id})" class="w-7 h-7 text-red-500 font-bold">-</button><span class="w-6 text-center text-xs font-bold">${i.qty}</span><button onclick="inc(${i.id})" class="w-7 h-7 text-green-500 font-bold">+</button></div><span class="w-16 text-right font-black">₹${i.price * i.qty}</span></div></div>`;
+    let total = 0;
+    const cart = tables[activeTable];
+
+    document.getElementById("cart").innerHTML = cart.length === 0
+        ? '<div class="text-center mt-20 text-gray-300 italic">No Items</div>'
+        : cart.map((item) => {
+            total += item.price * item.qty;
+            return `
+            <div class="flex justify-between items-center border-b pb-2">
+                <div class="flex-1 font-bold text-sm">${item.name}</div>
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center bg-gray-100 rounded-lg">
+                        <button onclick="dec(${item.id})" class="w-7 h-7 flex items-center justify-center text-red-500 font-bold">-</button>
+                        <span class="w-6 text-center text-xs font-bold">${item.qty}</span>
+                        <button onclick="inc(${item.id})" class="w-7 h-7 flex items-center justify-center text-green-500 font-bold">+</button>
+                    </div>
+                    <span class="w-16 text-right font-black">&#8377;${item.price * item.qty}</span>
+                </div>
+            </div>`;
         }).join("");
+
     document.getElementById("total").innerText = total;
 }
 
-function inc(id) { tables[activeTable].find(i => i.id == id).qty++; save(); renderCart(); }
+function inc(id) {
+    const item = tables[activeTable].find((entry) => entry.id === id);
+    if (!item) return;
+    item.qty++;
+    save();
+    renderCart();
+}
+
 function dec(id) {
-    let cart = tables[activeTable]; let i = cart.findIndex(x => x.id == id);
-    if (cart[i].qty > 1) cart[i].qty--; else cart.splice(i, 1);
-    save(); renderCart(); renderTables();
+    const cart = tables[activeTable];
+    const index = cart.findIndex((entry) => entry.id === id);
+    if (index === -1) return;
+
+    if (cart[index].qty > 1) {
+        cart[index].qty--;
+    } else {
+        cart.splice(index, 1);
+    }
+
+    save();
+    renderCart();
+    renderTables();
 }
 
 function exportToExcel() {
     if (sales.length === 0) return false;
+
     let csv = "Date,Time,Table,Total,Cash,Online,Mode\n";
-    sales.forEach(s => { csv += `${s.date},${s.time},${s.table},${s.total},${s.cash},${s.online},${s.mode}\n`; });
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const a = document.createElement('a');
+    sales.forEach((sale) => {
+        csv += `${sale.date},${sale.time},${sale.table},${sale.total},${sale.cash},${sale.online},${sale.mode}\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `FOOD_MOHALLA_${new Date().toLocaleDateString()}.csv`;
+    a.download = `FOOD_MOHALLA_REPORT_${new Date().toLocaleDateString()}.csv`;
     a.click();
     return true;
 }
 
 function closeRegister() {
-    if (confirm("Download Excel and Clear History?")) {
-        if (exportToExcel()) { sales = []; save(); renderReports(); alert("Register Closed."); }
+    if (confirm("Close Register and Save Excel? History will clear.")) {
+        if (exportToExcel()) {
+            sales = [];
+            save();
+            renderReports();
+            alert("Register Closed.");
+        }
     }
 }
 
 function processFinalSale(saleData) {
-    const fullSale = { id: Date.now(), date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString(), table: activeTable, ...saleData };
-    printReceipt('BILL', fullSale);
+    const fullSale = {
+        id: Date.now(),
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        table: activeTable,
+        ...saleData
+    };
+
+    printReceipt("BILL", fullSale);
     sales.push(fullSale);
     tables[activeTable] = [];
-    save(); renderCart(); renderTables();
+    save();
+    renderCart();
+    renderTables();
 }
 
-function renderMenu(){
+function renderMenu() {
     const q = document.getElementById("menu-search").value.toLowerCase();
-    let items = menu.filter(m => m.category === activeCat);
-    if(q) items = items.filter(m => m.name.toLowerCase().includes(q));
-    document.getElementById("menu").innerHTML = items.map(m=>`<div onclick="addCart(${m.id})" class="bg-white p-3 rounded-2xl shadow-sm border active:scale-95 transition cursor-pointer"><div class="h-24 bg-gray-100 rounded-xl mb-2 overflow-hidden"><img src="${m.img || 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200'}" class="w-full h-full object-cover"></div><h3 class="font-bold text-xs truncate">${m.name}</h3><p class="text-red-600 font-black text-sm">₹${m.price}</p></div>`).join("");
+    let items = menu.filter((item) => item.category === activeCat);
+
+    if (q) items = items.filter((item) => item.name.toLowerCase().includes(q));
+
+    document.getElementById("menu").innerHTML = items.length === 0
+        ? '<div class="col-span-full text-center text-gray-500 italic py-10">No items found in this category.</div>'
+        : items.map((item) => `
+            <div onclick="addCart(${item.id})" class="bg-white p-3 rounded-2xl shadow-sm border active:scale-95 transition cursor-pointer">
+                <div class="h-24 bg-gray-100 rounded-xl mb-2 overflow-hidden">
+                    <img src="${item.img}" alt="${item.name}" class="w-full h-full object-cover">
+                </div>
+                <h3 class="font-bold text-xs truncate">${item.name}</h3>
+                <p class="text-red-600 font-black text-sm">&#8377;${item.price}</p>
+            </div>
+        `).join("");
 }
 
 function printReceipt(type, saleData = null) {
     const cart = tables[activeTable];
-    const total = saleData ? saleData.total : cart.reduce((sum, i) => sum + (i.price*i.qty), 0);
-    let html = `<div style="font-family:monospace;width:70mm;font-size:12px;"><center>🍕<br><b>FOOD MOHALLA</b><br>${type==='KOT'?'KOT':'BILL'}<br>Tbl:${activeTable}</center><hr>${cart.map(i => `<div>${i.name} x${i.qty}</div>`).join('')}<hr>${type !== 'KOT' ? `TOTAL: ₹${total}<br>Mode: ${saleData.mode}` : ''}</div>`;
-    const frame = document.getElementById('print-frame');
-    frame.contentWindow.document.open(); frame.contentWindow.document.write(html); frame.contentWindow.document.close();
+    const total = saleData ? saleData.total : cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const html = `<div style="font-family:monospace;width:70mm;font-size:12px;"><center>&#127829;<br><b>FOOD MOHALLA</b><br>${type === "KOT" ? "KOT" : "BILL"}<br>Tbl:${activeTable}</center><hr>${cart.map((item) => `<div>${item.name} x${item.qty}</div>`).join("")}<hr>${type !== "KOT" ? `TOTAL: &#8377;${total}<br>Mode: ${saleData.mode}` : ""}</div>`;
+    const frame = document.getElementById("print-frame");
+
+    frame.contentWindow.document.open();
+    frame.contentWindow.document.write(html);
+    frame.contentWindow.document.close();
     frame.contentWindow.print();
 }
 
 function processQuickBill(mode) {
-    const total = parseInt(document.getElementById("total").innerText);
-    if(total <= 0) return alert("Empty!");
-    processFinalSale({ total, cash: mode==='Cash'?total:0, online: mode==='Online'?total:0, mode });
+    const total = parseInt(document.getElementById("total").innerText, 10);
+    if (total <= 0) return alert("Cart is empty.");
+
+    processFinalSale({
+        total,
+        cash: mode === "Cash" ? total : 0,
+        online: mode === "Online" ? total : 0,
+        mode
+    });
 }
 
 function calculateSplit() {
-    const total = parseInt(document.getElementById("total").innerText);
-    const cash = parseInt(document.getElementById("split-cash").value) || 0;
-    document.getElementById("split-online").value = Math.max(0, total - cash);
+    const total = parseInt(document.getElementById("total").innerText, 10);
+    const cashInput = document.getElementById("split-cash");
+    const cash = parseInt(cashInput.value, 10) || 0;
+
+    if (cash > total) cashInput.value = total;
+    document.getElementById("split-online").value = Math.max(0, total - (parseInt(cashInput.value, 10) || 0));
 }
 
 function submitSplitPayment() {
-    const total = parseInt(document.getElementById("total").innerText);
-    const cash = parseInt(document.getElementById("split-cash").value) || 0;
-    const online = parseInt(document.getElementById("split-online").value) || 0;
+    const total = parseInt(document.getElementById("total").innerText, 10);
+    const cash = parseInt(document.getElementById("split-cash").value, 10) || 0;
+    const online = parseInt(document.getElementById("split-online").value, 10) || 0;
+
+    if ((cash + online) !== total) return alert("Total mismatch!");
+
     processFinalSale({ total, cash, online, mode: "Split" });
     closeSplitModal();
 }
@@ -248,41 +369,154 @@ function save() {
     localStorage.setItem("fm_sales", JSON.stringify(sales));
 }
 
-function renderTables(){
-    document.getElementById("tables").innerHTML = TABLES.map(t=>`<button onclick="setTable('${t}')" class="w-full py-4 rounded-xl transition text-sm ${t===activeTable?'active-table':'bg-gray-700 text-gray-300'}">${t}${tables[t].length > 0 ? ' ●' : ''}</button>`).join("");
+function renderTables() {
+    document.getElementById("tables").innerHTML = TABLES.map((table) => `
+        <button onclick="setTable('${table}')" class="w-full py-4 rounded-xl transition text-sm ${table === activeTable ? "active-table" : "bg-gray-700 text-gray-300"}">
+            ${table}${tables[table].length > 0 ? " &#9679;" : ""}
+        </button>
+    `).join("");
+
     document.getElementById("table-name").innerText = activeTable;
 }
 
-function renderCats(){
-    document.getElementById("cats").innerHTML = CATEGORIES.map(c=>`<button onclick="setCat('${c}')" class="pb-2 transition-all ${c===activeCat?'active-tab':'text-gray-400'} font-bold uppercase text-xs">${c}</button>`).join("");
-    document.getElementById("new-cat").innerHTML = CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join("");
+function renderCats() {
+    document.getElementById("cats").innerHTML = CATEGORIES.map((category) => `
+        <button onclick="setCat('${category}')" class="pb-2 transition-all ${category === activeCat ? "active-tab" : "text-gray-400"} font-bold uppercase text-xs">
+            ${category}
+        </button>
+    `).join("");
+
+    document.getElementById("new-cat").innerHTML = CATEGORIES.map((category) => `
+        <option value="${category}">${category}</option>
+    `).join("");
 }
 
-function addCart(id){
-    let item = menu.find(m=>m.id==id); let cart = tables[activeTable]; let exist = cart.find(i=>i.id==id);
-    if(exist) exist.qty++; else cart.push({...item, qty:1});
-    save(); renderCart(); renderTables();
+function addCart(id) {
+    const item = menu.find((entry) => entry.id === id);
+    const cart = tables[activeTable];
+    const existing = cart.find((entry) => entry.id === id);
+
+    if (!item) return;
+    if (existing) existing.qty++;
+    else cart.push({ ...item, qty: 1 });
+
+    save();
+    renderCart();
+    renderTables();
 }
 
-function setTable(t){ activeTable=t; renderTables(); renderCart(); }
-function setCat(c){ activeCat=c; renderCats(); renderMenu(); }
-function toggleAdmin(){ const m = document.getElementById("admin-modal"); m.style.display = m.style.display === "flex" ? "none" : "flex"; }
-function showAdminSection(id){ document.querySelectorAll('.admin-section').forEach(s => s.classList.add('hidden')); document.getElementById('section-' + id).classList.remove('hidden'); if(id === 'reports') renderReports(); }
-function verifyOwnerAndShow(section) { if(prompt("OWNER PASSWORD:") === AUTH_CONFIG.ownerPass) { showAdminSection(section); renderInventory(); } }
-function clearTable(){ if(confirm("Clear?")) { tables[activeTable] = []; save(); renderCart(); renderTables(); } }
-function addItem(){ let name = document.getElementById("new-name").value; let price = document.getElementById("new-price").value; if(!name || !price) return; menu.push({ id: Date.now(), name, category: document.getElementById("new-cat").value, price: parseFloat(price), img: document.getElementById("new-img").value }); save(); renderMenu(); renderInventory(); }
-function renderInventory(){ document.getElementById("inventory-list").innerHTML = menu.map(m=>`<div class="flex justify-between p-2 border rounded bg-white text-xs mb-1"><span><b>${m.name}</b> (₹${m.price})</span><button onclick="deleteMenu(${m.id})" class="text-red-500">Delete</button></div>`).join(""); }
-function deleteMenu(id){ if(confirm("Delete?")){ menu = menu.filter(m => m.id !== id); save(); renderMenu(); renderInventory(); } }
-function renderReports(){
-    let tc = sales.reduce((a,b)=>a+(b.cash||0), 0); let to = sales.reduce((a,b)=>a+(b.online||0), 0);
-    document.getElementById("report-stats").innerHTML = `<div class="p-4 bg-green-50 border font-bold">Total: ₹${tc + to}</div><div class="p-4 bg-yellow-50 border font-bold">Cash: ₹${tc}</div><div class="p-4 bg-blue-50 border font-bold">Online: ₹${to}</div>`;
-    document.getElementById("report-list").innerHTML = sales.slice().reverse().map(s=>`<div class="text-[10px] p-2 border-b flex justify-between bg-white"><span>${s.date} ${s.time}<br>Tbl:${s.table}</span><span class="text-right font-bold">₹${s.total}</span></div>`).join("");
+function setTable(table) {
+    activeTable = table;
+    renderTables();
+    renderCart();
 }
-function openSplitModal() { document.getElementById("split-total-display").innerText = document.getElementById("total").innerText; document.getElementById("split-payment-modal").style.display = "flex"; }
-function closeSplitModal() { document.getElementById("split-payment-modal").style.display = "none"; }
 
-// STARTUP PERSISTENCE
-if(sessionStorage.getItem("fm_auth") === "true") {
+function setCat(category) {
+    activeCat = category;
+    renderCats();
+    renderMenu();
+}
+
+function toggleAdmin() {
+    const modal = document.getElementById("admin-modal");
+    modal.style.display = modal.style.display === "flex" ? "none" : "flex";
+}
+
+function showAdminSection(id) {
+    document.querySelectorAll(".admin-section").forEach((section) => section.classList.add("hidden"));
+    document.getElementById(`section-${id}`).classList.remove("hidden");
+    if (id === "reports") renderReports();
+}
+
+function verifyOwnerAndShow(section) {
+    if (prompt("OWNER PASSWORD:") === AUTH_CONFIG.ownerPass) {
+        showAdminSection(section);
+        renderInventory();
+    }
+}
+
+function clearTable() {
+    if (confirm("Clear current table cart?")) {
+        tables[activeTable] = [];
+        save();
+        renderCart();
+        renderTables();
+    }
+}
+
+function addItem() {
+    const name = document.getElementById("new-name").value.trim();
+    const price = Number(document.getElementById("new-price").value);
+    const cat = document.getElementById("new-cat").value;
+    const img = document.getElementById("new-img").value.trim() || "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=200&auto=format&fit=crop";
+
+    if (!name || !price || price <= 0) {
+        return alert("Enter a valid item name and price.");
+    }
+
+    menu.push({ id: Date.now(), name, category: cat, price, img });
+    document.getElementById("new-name").value = "";
+    document.getElementById("new-price").value = "";
+    document.getElementById("new-img").value = "";
+
+    save();
+    renderMenu();
+    renderInventory();
+}
+
+function renderInventory() {
+    document.getElementById("inventory-list").innerHTML = menu.map((item) => `
+        <div class="flex justify-between p-2 border rounded bg-white text-xs mb-1">
+            <span><b>${item.name}</b> (${item.category}) (&#8377;${item.price})</span>
+            <button onclick="deleteMenu(${item.id})" class="text-red-500 font-bold">Delete</button>
+        </div>
+    `).join("");
+}
+
+function deleteMenu(id) {
+    if (confirm("Delete this menu item?")) {
+        menu = menu.filter((item) => item.id !== id);
+        save();
+        renderMenu();
+        renderInventory();
+    }
+}
+
+function renderReports() {
+    const tc = sales.reduce((acc, item) => acc + (item.cash || 0), 0);
+    const to = sales.reduce((acc, item) => acc + (item.online || 0), 0);
+
+    document.getElementById("report-stats").innerHTML = `
+        <div class="p-4 bg-green-50 border font-bold">Total: &#8377;${tc + to}</div>
+        <div class="p-4 bg-yellow-50 border font-bold">Cash: &#8377;${tc}</div>
+        <div class="p-4 bg-blue-50 border font-bold">Online: &#8377;${to}</div>
+    `;
+
+    document.getElementById("report-list").innerHTML = sales.length === 0
+        ? '<div class="p-4 bg-white border rounded text-sm text-gray-500 italic">No sales recorded yet.</div>'
+        : sales.slice().reverse().map((sale) => `
+            <div class="text-[10px] p-2 border-b flex justify-between bg-white">
+                <span>${sale.date} ${sale.time}<br>Tbl:${sale.table}</span>
+                <span class="text-right font-bold">&#8377;${sale.total} (${sale.mode})</span>
+            </div>
+        `).join("");
+}
+
+function openSplitModal() {
+    const total = parseInt(document.getElementById("total").innerText, 10);
+    if (total <= 0) return alert("Cart is empty.");
+
+    document.getElementById("split-total-display").innerText = total;
+    document.getElementById("split-cash").value = "";
+    document.getElementById("split-online").value = total;
+    document.getElementById("split-payment-modal").style.display = "flex";
+}
+
+function closeSplitModal() {
+    document.getElementById("split-payment-modal").style.display = "none";
+}
+
+if (sessionStorage.getItem("fm_auth") === "true") {
     unlockApp();
 }
 </script>
