@@ -133,7 +133,12 @@
 <script>
 const AUTH_CONFIG = { user: "admin", pass: "admin123", ownerPass: "owner789" };
 const TABLES = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "P-1", "P-2"];
-const CATEGORIES = ["PIZZA", "PIZZA SIDES", "BURGER", "PASTA", "BURGIZZA", "SANDWICH", "FRY-O-CLOCK", "BITE BUDDIES", "MOCKTAILS", "SIP & CHILL", "SIZZLING & SWEET"];
+const CATEGORIES = [
+"PIZZA", "PIZZA SIDES", "BURGER", "PASTA", "BURGIZZA",
+"SANDWICH", "FRY-O-CLOCK", "BITE BUDDIES",
+"MOCKTAILS", "SIP & CHILL", "SIZZLING & SWEET",
+"COMBO", "MOMOS", "WAFFLE", "GARLIC STUFF", "OTHER"
+];
 
 let defaultMenu = [
     { id: 1, name: "Single Cheese (R)", category: "PIZZA", price: 119, img: "https://images.unsplash.com/photo-1593560704563-f176a2eb61db?q=80&w=200&auto=format&fit=crop" },
@@ -322,7 +327,23 @@ function renderMenu() {
 function printReceipt(type, saleData = null) {
     const cart = tables[activeTable];
     const total = saleData ? saleData.total : cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    const html = `<div style="font-family:monospace;width:70mm;font-size:12px;"><center>&#127829;<br><b>FOOD MOHALLA</b><br>${type === "KOT" ? "KOT" : "BILL"}<br>Tbl:${activeTable}</center><hr>${cart.map((item) => `<div>${item.name} x${item.qty}</div>`).join("")}<hr>${type !== "KOT" ? `TOTAL: &#8377;${total}<br>Mode: ${saleData.mode}` : ""}</div>`;
+    const html = `
+<div style="font-family:monospace;width:90mm;font-size:16px;padding:10px;">
+<center style="font-size:18px;font-weight:bold;">
+🍕 FOOD MOHALLA<br>
+${type === "KOT" ? "KOT" : "BILL"}<br>
+Tbl: ${activeTable}
+</center>
+<hr>
+${cart.map((item) => `<div style="margin:5px 0;">${item.name} x${item.qty}</div>`).join("")}
+<hr>
+${type !== "KOT" ? `
+<div style="font-size:18px;font-weight:bold;">
+TOTAL: ₹${total}
+</div>
+<div>Mode: ${saleData.mode}</div>
+` : ""}
+</div>`;<center>&#127829;<br><b>FOOD MOHALLA</b><br>${type === "KOT" ? "KOT" : "BILL"}<br>Tbl:${activeTable}</center><hr>${cart.map((item) => `<div>${item.name} x${item.qty}</div>`).join("")}<hr>${type !== "KOT" ? `TOTAL: &#8377;${total}<br>Mode: ${saleData.mode}` : ""}</div>`;
     const frame = document.getElementById("print-frame");
 
     frame.contentWindow.document.open();
