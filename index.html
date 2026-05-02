@@ -8,7 +8,7 @@
     <style>
         .active-tab { border-bottom: 4px solid #facc15; font-weight: bold; color: #facc15; }
         .active-table { background: #facc15 !important; color: black; font-weight: bold; transform: scale(1.05); }
-        #admin-modal, #split-payment-modal, #main-app { display: none; }
+        .hidden-section { display: none !important; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         @media print { .no-print { display: none; } }
     </style>
@@ -31,7 +31,7 @@
 </div>
 
 <!-- Main Application -->
-<div id="main-app" class="flex-col h-full">
+<div id="main-app" class="hidden-section flex-col h-full">
     <div class="bg-red-700 p-3 flex justify-between items-center shadow-lg no-print">
         <div class="flex items-center gap-3">
             <span class="text-4xl">🍕</span>
@@ -44,10 +44,8 @@
     </div>
 
     <div class="flex flex-1 overflow-hidden">
-        <!-- Tables Sidebar -->
         <div id="tables" class="w-24 bg-gray-800 p-2 overflow-y-auto border-r border-gray-700 flex flex-col gap-2 no-print"></div>
 
-        <!-- Cart Section -->
         <div class="w-96 bg-white text-black flex flex-col shadow-2xl no-print">
             <div class="p-4 bg-gray-100 font-bold border-b flex justify-between items-center">
                 <span class="text-lg">Table: <span id="table-name" class="text-red-600">--</span></span>
@@ -69,7 +67,6 @@
             </div>
         </div>
 
-        <!-- Menu Section -->
         <div class="flex-1 flex flex-col bg-gray-100 text-black no-print">
             <div class="bg-white shadow-sm p-4 border-b">
                 <div id="cats" class="flex gap-4 overflow-x-auto scrollbar-hide whitespace-nowrap px-2 mb-3"></div>
@@ -83,8 +80,8 @@
     </div>
 </div>
 
-<!-- Split Payment Modal -->
-<div id="split-payment-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[2000] p-4 text-black">
+<!-- Modals -->
+<div id="split-payment-modal" class="hidden-section fixed inset-0 bg-black/90 flex items-center justify-center z-[2000] p-4 text-black">
     <div class="bg-white p-6 rounded-2xl w-full max-w-sm">
         <h3 class="text-xl font-bold mb-4 border-b pb-2">Split Bill</h3>
         <div class="mb-4 rounded-lg bg-orange-50 border border-orange-200 px-4 py-3 font-bold text-orange-700">
@@ -99,8 +96,7 @@
     </div>
 </div>
 
-<!-- Admin Modal -->
-<div id="admin-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] p-4 text-black">
+<div id="admin-modal" class="hidden-section fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] p-4 text-black">
     <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-2xl overflow-hidden flex flex-col">
         <div class="p-4 bg-gray-800 text-white flex justify-between items-center">
             <h2 class="text-xl font-bold">MANAGEMENT</h2>
@@ -112,7 +108,7 @@
                 <button onclick="showAdminSection('reports')" class="text-left p-3 rounded hover:bg-gray-200 font-bold">REPORTS</button>
             </div>
             <div class="flex-1 p-6 overflow-y-auto">
-                <div id="section-editor" class="admin-section hidden">
+                <div id="section-editor" class="admin-section hidden-section">
                     <div class="grid grid-cols-2 gap-4 mb-8 p-4 border rounded-xl bg-gray-50">
                         <input id="new-name" placeholder="Item Name" class="border p-2 rounded">
                         <select id="new-cat" class="border p-2 rounded"></select>
@@ -122,13 +118,10 @@
                     </div>
                     <div id="inventory-list" class="space-y-1"></div>
                 </div>
-                <div id="section-reports" class="admin-section hidden">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold">Sales</h3>
-                        <button onclick="closeRegister()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold">🔒 CLOSE REGISTER (CSV)</button>
-                    </div>
+                <div id="section-reports" class="admin-section hidden-section">
                     <div id="report-stats" class="grid grid-cols-3 gap-4 mb-6"></div>
                     <div id="report-list" class="space-y-1"></div>
+                    <button onclick="closeRegister()" class="mt-4 w-full bg-red-600 text-white py-2 rounded font-bold">CLOSE REGISTER & DOWNLOAD CSV</button>
                 </div>
             </div>
         </div>
@@ -138,30 +131,23 @@
 <iframe id="print-frame" style="display:none;"></iframe>
 
 <script>
-// --- Configuration & Initialization ---
+// --- CONFIG & STATE ---
 const AUTH_CONFIG = { user: "admin", pass: "admin123", ownerPass: "owner789" };
 const TABLES = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "P-1", "P-2"];
 const CATEGORIES = ["PIZZA", "PIZZA SIDES", "BURGER", "PASTA", "BURGIZZA", "SANDWICH", "FRY-O-CLOCK", "BITE BUDDIES", "MOCKTAILS", "SIP & CHILL", "SIZZLING & SWEET"];
 
-const defaultMenu = [
-    { id: 1, name: "Single Cheese (R)", category: "PIZZA", price: 119, img: "https://images.unsplash.com/photo-1593560704563-f176a2eb61db?q=80&w=200&auto=format&fit=crop" },
-    { id: 4, name: "Double Cheese (R)", category: "PIZZA", price: 149, img: "https://images.unsplash.com/photo-1594179047519-f347310d3322?q=80&w=200&auto=format&fit=crop" },
-    { id: 13, name: "Regular Garlic Bread", category: "PIZZA SIDES", price: 69, img: "https://images.unsplash.com/photo-1619531659550-881af319de01?q=80&w=200&auto=format&fit=crop" },
-    { id: 16, name: "Aloo Tikki Burger", category: "BURGER", price: 69, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=200&auto=format&fit=crop" },
-    { id: 23, name: "Classic Fries", category: "FRY-O-CLOCK", price: 69, img: "https://images.unsplash.com/photo-1573080493109-dbdd990dbf8b?q=80&w=200&auto=format&fit=crop" },
-    { id: 25, name: "Mint Mojito", category: "MOCKTAILS", price: 119, img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=200&auto=format&fit=crop" }
-];
-
 let activeTable = TABLES[0];
 let activeCat = CATEGORIES[0];
-let menu = JSON.parse(localStorage.getItem("fm_menu")) || defaultMenu;
+let menu = JSON.parse(localStorage.getItem("fm_menu")) || [
+    { id: 1, name: "Single Cheese (R)", category: "PIZZA", price: 119, img: "https://images.unsplash.com/photo-1593560704563-f176a2eb61db?w=200" },
+    { id: 16, name: "Aloo Tikki Burger", category: "BURGER", price: 69, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200" }
+];
 let tables = JSON.parse(localStorage.getItem("fm_tables")) || {};
 let sales = JSON.parse(localStorage.getItem("fm_sales")) || [];
 
-// Ensure all tables exist in the object
 TABLES.forEach(t => { if (!tables[t]) tables[t] = []; });
 
-// --- Auth Functions ---
+// --- AUTH ---
 function handleLogin() {
     const u = document.getElementById("login-user").value.trim();
     const p = document.getElementById("login-pass").value.trim();
@@ -174,7 +160,8 @@ function handleLogin() {
 
 function unlockApp() {
     sessionStorage.setItem("fm_auth", "true");
-    document.getElementById("login-overlay").style.display = "none";
+    document.getElementById("login-overlay").classList.add("hidden-section");
+    document.getElementById("main-app").classList.remove("hidden-section");
     document.getElementById("main-app").style.display = "flex";
     initSystem();
 }
@@ -191,13 +178,7 @@ function initSystem() {
     renderCart();
 }
 
-// --- Cart & Table Functions ---
-function setTable(t) {
-    activeTable = t;
-    renderTables();
-    renderCart();
-}
-
+// --- UI RENDERING ---
 function renderTables() {
     document.getElementById("tables").innerHTML = TABLES.map(t => `
         <button onclick="setTable('${t}')" class="w-full py-4 rounded-xl transition text-sm ${t === activeTable ? 'active-table' : 'bg-gray-700 text-gray-300'}">
@@ -205,77 +186,6 @@ function renderTables() {
         </button>
     `).join("");
     document.getElementById("table-name").innerText = activeTable;
-}
-
-function renderCart() {
-    let total = 0;
-    const cart = tables[activeTable];
-    const container = document.getElementById("cart");
-    
-    if (cart.length === 0) {
-        container.innerHTML = '<div class="text-center mt-20 text-gray-300 italic">No Items</div>';
-    } else {
-        container.innerHTML = cart.map(item => {
-            total += item.price * item.qty;
-            return `
-            <div class="flex justify-between items-center border-b pb-2">
-                <div class="flex-1 font-bold text-sm">${item.name}</div>
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center bg-gray-100 rounded-lg">
-                        <button onclick="dec(${item.id})" class="w-7 h-7 flex items-center justify-center text-red-500 font-bold">-</button>
-                        <span class="w-6 text-center text-xs font-bold">${item.qty}</span>
-                        <button onclick="inc(${item.id})" class="w-7 h-7 flex items-center justify-center text-green-500 font-bold">+</button>
-                    </div>
-                    <span class="w-16 text-right font-black">₹${item.price * item.qty}</span>
-                </div>
-            </div>`;
-        }).join("");
-    }
-    document.getElementById("total").innerText = total;
-}
-
-function addCart(id) {
-    const item = menu.find(m => m.id === id);
-    if (!item) return;
-    const existing = tables[activeTable].find(i => i.id === id);
-    if (existing) existing.qty++;
-    else tables[activeTable].push({ ...item, qty: 1 });
-    save();
-    renderCart();
-    renderTables();
-}
-
-function inc(id) {
-    const item = tables[activeTable].find(i => i.id === id);
-    if (item) item.qty++;
-    save();
-    renderCart();
-}
-
-function dec(id) {
-    const idx = tables[activeTable].findIndex(i => i.id === id);
-    if (idx === -1) return;
-    if (tables[activeTable][idx].qty > 1) tables[activeTable][idx].qty--;
-    else tables[activeTable].splice(idx, 1);
-    save();
-    renderCart();
-    renderTables();
-}
-
-function clearTable() {
-    if (confirm("Clear this table?")) {
-        tables[activeTable] = [];
-        save();
-        renderCart();
-        renderTables();
-    }
-}
-
-// --- Menu Functions ---
-function setCat(c) {
-    activeCat = c;
-    renderCats();
-    renderMenu();
 }
 
 function renderCats() {
@@ -291,43 +201,100 @@ function renderMenu() {
     const q = document.getElementById("menu-search").value.toLowerCase();
     let filtered = menu.filter(m => m.category === activeCat);
     if (q) filtered = filtered.filter(m => m.name.toLowerCase().includes(q));
-    
-    document.getElementById("menu").innerHTML = filtered.length === 0
-        ? '<div class="col-span-full text-center text-gray-500 italic py-10">No items found.</div>'
-        : filtered.map(m => `
-            <div onclick="addCart(${m.id})" class="bg-white p-3 rounded-2xl shadow-sm border active:scale-95 transition cursor-pointer">
-                <div class="h-24 bg-gray-100 rounded-xl mb-2 overflow-hidden">
-                    <img src="${m.img}" class="w-full h-full object-cover">
-                </div>
-                <h3 class="font-bold text-xs truncate">${m.name}</h3>
-                <p class="text-red-600 font-black text-sm">₹${m.price}</p>
+    document.getElementById("menu").innerHTML = filtered.map(m => `
+        <div onclick="addCart(${m.id})" class="bg-white p-3 rounded-2xl shadow-sm border active:scale-95 transition cursor-pointer">
+            <div class="h-24 bg-gray-100 rounded-xl mb-2 overflow-hidden">
+                <img src="${m.img}" class="w-full h-full object-cover">
             </div>
-        `).join("");
+            <h3 class="font-bold text-xs truncate text-black">${m.name}</h3>
+            <p class="text-red-600 font-black text-sm">₹${m.price}</p>
+        </div>
+    `).join("");
 }
 
-// --- Payment & Sales ---
+function renderCart() {
+    let total = 0;
+    const cart = tables[activeTable];
+    const container = document.getElementById("cart");
+    if (cart.length === 0) {
+        container.innerHTML = '<div class="text-center mt-20 text-gray-400 italic">No Items</div>';
+    } else {
+        container.innerHTML = cart.map(item => {
+            total += item.price * item.qty;
+            return `
+            <div class="flex justify-between items-center border-b pb-2 text-black">
+                <div class="flex-1 font-bold text-sm">${item.name}</div>
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center bg-gray-100 rounded-lg">
+                        <button onclick="dec(${item.id})" class="w-7 h-7 flex items-center justify-center text-red-500 font-bold">-</button>
+                        <span class="w-6 text-center text-xs font-bold">${item.qty}</span>
+                        <button onclick="inc(${item.id})" class="w-7 h-7 flex items-center justify-center text-green-500 font-bold">+</button>
+                    </div>
+                    <span class="w-16 text-right font-black">₹${item.price * item.qty}</span>
+                </div>
+            </div>`;
+        }).join("");
+    }
+    document.getElementById("total").innerText = total;
+}
+
+// --- LOGIC ---
+function setTable(t) { activeTable = t; renderTables(); renderCart(); }
+function setCat(c) { activeCat = c; renderCats(); renderMenu(); }
+
+function addCart(id) {
+    const item = menu.find(m => m.id === id);
+    if (!item) return;
+    const existing = tables[activeTable].find(i => i.id === id);
+    if (existing) existing.qty++;
+    else tables[activeTable].push({ ...item, qty: 1 });
+    save(); renderCart(); renderTables();
+}
+
+function inc(id) {
+    const item = tables[activeTable].find(i => i.id === id);
+    if (item) item.qty++;
+    save(); renderCart();
+}
+
+function dec(id) {
+    const idx = tables[activeTable].findIndex(i => i.id === id);
+    if (idx === -1) return;
+    if (tables[activeTable][idx].qty > 1) tables[activeTable][idx].qty--;
+    else tables[activeTable].splice(idx, 1);
+    save(); renderCart(); renderTables();
+}
+
+function clearTable() {
+    if (confirm("Clear Table?")) { tables[activeTable] = []; save(); renderCart(); renderTables(); }
+}
+
+function save() {
+    localStorage.setItem("fm_menu", JSON.stringify(menu));
+    localStorage.setItem("fm_tables", JSON.stringify(tables));
+    localStorage.setItem("fm_sales", JSON.stringify(sales));
+}
+
+// --- BILLING & ADMIN ---
 function processQuickBill(mode) {
     const total = parseInt(document.getElementById("total").innerText);
-    if (total <= 0) return alert("Cart empty");
-    processFinalSale({ total, cash: mode === 'Cash' ? total : 0, online: mode === 'Online' ? total : 0, mode });
+    if (total <= 0) return alert("Cart is empty");
+    const sale = { total, cash: mode === 'Cash' ? total : 0, online: mode === 'Online' ? total : 0, mode, items: [...tables[activeTable]], table: activeTable, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() };
+    sales.push(sale);
+    printReceipt('BILL', sale);
+    tables[activeTable] = [];
+    save(); renderCart(); renderTables();
 }
 
-function processFinalSale(data) {
-    const sale = {
-        id: Date.now(),
-        date: new Date().toLocaleDateString(),
-        time: new Date().toLocaleTimeString(),
-        table: activeTable,
-        items: [...tables[activeTable]],
-        ...data
-    };
-    printReceipt('BILL', sale);
-    sales.push(sale);
-    tables[activeTable] = [];
-    save();
-    renderCart();
-    renderTables();
+function openSplitModal() {
+    const total = parseInt(document.getElementById("total").innerText);
+    if (total <= 0) return;
+    document.getElementById("split-total-display").innerText = total;
+    document.getElementById("split-online").value = total;
+    document.getElementById("split-payment-modal").classList.remove("hidden-section");
 }
+
+function closeSplitModal() { document.getElementById("split-payment-modal").classList.add("hidden-section"); }
 
 function calculateSplit() {
     const total = parseInt(document.getElementById("total").innerText);
@@ -340,52 +307,21 @@ function submitSplitPayment() {
     const total = parseInt(document.getElementById("total").innerText);
     const cash = parseInt(document.getElementById("split-cash").value) || 0;
     const online = parseInt(document.getElementById("split-online").value) || 0;
-    if (cash + online !== total) return alert("Mismatch");
-    processFinalSale({ total, cash, online, mode: 'Split' });
-    closeSplitModal();
+    const sale = { total, cash, online, mode: 'Split', items: [...tables[activeTable]], table: activeTable, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() };
+    sales.push(sale);
+    printReceipt('BILL', sale);
+    tables[activeTable] = [];
+    save(); renderCart(); renderTables(); closeSplitModal();
 }
 
-// --- Printing ---
-function printReceipt(type, saleData = null) {
-    const cart = saleData ? saleData.items : tables[activeTable];
-    const total = saleData ? saleData.total : cart.reduce((s, i) => s + (i.price * i.qty), 0);
-    const html = `
-    <div style="font-family:monospace; width:80mm; padding:10px;">
-        <center>
-            <div style="font-size:20px;">🍕 <b>FOOD MOHALLA</b></div>
-            <div>${type === 'KOT' ? 'KITCHEN ORDER' : 'TAX INVOICE'}</div>
-            <hr>
-            <div>Table: ${activeTable} | ${new Date().toLocaleTimeString()}</div>
-        </center>
-        <hr>
-        ${cart.map(i => `<div style="display:flex; justify-content:between;"><span>${i.name} x${i.qty}</span> <span>₹${i.price * i.qty}</span></div>`).join("")}
-        <hr>
-        ${type !== 'KOT' ? `<div style="font-size:18px; font-weight:bold; text-align:right;">TOTAL: ₹${total}</div><div style="text-align:right;">Mode: ${saleData.mode}</div>` : ""}
-    </div>`;
-    
-    const frame = document.getElementById("print-frame");
-    frame.contentWindow.document.open();
-    frame.contentWindow.document.write(html);
-    frame.contentWindow.document.close();
-    frame.contentWindow.print();
-}
+function toggleAdmin() { document.getElementById("admin-modal").classList.toggle("hidden-section"); }
 
-// --- Admin Functions ---
-function toggleAdmin() {
-    const m = document.getElementById("admin-modal");
-    m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
-}
-
-function showAdminSection(id) {
-    document.querySelectorAll(".admin-section").forEach(s => s.classList.add("hidden"));
-    document.getElementById(`section-${id}`).classList.remove("hidden");
-    if (id === 'reports') renderReports();
-}
-
-function verifyOwnerAndShow(section) {
+function verifyOwnerAndShow(sec) {
     if (prompt("Owner Password:") === AUTH_CONFIG.ownerPass) {
-        showAdminSection(section);
-        renderInventory();
+        document.querySelectorAll(".admin-section").forEach(s => s.classList.add("hidden-section"));
+        document.getElementById(`section-${sec}`).classList.remove("hidden-section");
+        if(sec === 'editor') renderInventory();
+        if(sec === 'reports') renderReports();
     }
 }
 
@@ -393,85 +329,42 @@ function addItem() {
     const name = document.getElementById("new-name").value;
     const price = parseInt(document.getElementById("new-price").value);
     const cat = document.getElementById("new-cat").value;
-    const img = document.getElementById("new-img").value || "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=200&auto=format&fit=crop";
-    
-    if (!name || isNaN(price)) return alert("Valid data please");
-    menu.push({ id: Date.now(), name, category: cat, price, img });
-    save();
-    renderMenu();
-    renderInventory();
-}
-
-function deleteMenu(id) {
-    if (confirm("Delete?")) {
-        menu = menu.filter(m => m.id !== id);
-        save();
-        renderInventory();
-        renderMenu();
-    }
+    if (!name || isNaN(price)) return alert("Invalid Data");
+    menu.push({ id: Date.now(), name, category: cat, price, img: document.getElementById("new-img").value || "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200" });
+    save(); renderMenu(); renderInventory();
 }
 
 function renderInventory() {
-    document.getElementById("inventory-list").innerHTML = menu.map(m => `
-        <div class="flex justify-between p-2 border rounded bg-white text-xs mb-1">
-            <span><b>${m.name}</b> (${m.category}) - ₹${m.price}</span>
-            <button onclick="deleteMenu(${m.id})" class="text-red-500 font-bold">Delete</button>
-        </div>
-    `).join("");
+    document.getElementById("inventory-list").innerHTML = menu.map(m => `<div class="flex justify-between p-2 border mb-1 bg-white text-black text-xs"><span>${m.name} (₹${m.price})</span><button onclick="deleteItem(${m.id})" class="text-red-500">Delete</button></div>`).join("");
 }
 
+function deleteItem(id) { menu = menu.filter(m => m.id !== id); save(); renderInventory(); renderMenu(); }
+
 function renderReports() {
-    const cash = sales.reduce((a, b) => a + b.cash, 0);
-    const online = sales.reduce((a, b) => a + b.online, 0);
-    document.getElementById("report-stats").innerHTML = `
-        <div class="p-4 bg-green-50 border font-bold">Total: ₹${cash + online}</div>
-        <div class="p-4 bg-yellow-50 border font-bold">Cash: ₹${cash}</div>
-        <div class="p-4 bg-blue-50 border font-bold">Online: ₹${online}</div>
-    `;
-    document.getElementById("report-list").innerHTML = sales.slice().reverse().map(s => `
-        <div class="text-[10px] p-2 border-b flex justify-between bg-white">
-            <span>${s.date} ${s.time} | ${s.table}</span>
-            <span class="font-bold">₹${s.total} (${s.mode})</span>
-        </div>
-    `).join("");
+    const cash = sales.reduce((a, b) => a + (b.cash || 0), 0);
+    const online = sales.reduce((a, b) => a + (b.online || 0), 0);
+    document.getElementById("report-stats").innerHTML = `<div class="p-2 bg-green-100 text-black">Total: ₹${cash+online}</div><div class="p-2 bg-yellow-100 text-black">Cash: ₹${cash}</div><div class="p-2 bg-blue-100 text-black">Online: ₹${online}</div>`;
+    document.getElementById("report-list").innerHTML = sales.slice().reverse().map(s => `<div class="text-[10px] border-b p-1 text-black">${s.time} - ${s.table} - ₹${s.total} (${s.mode})</div>`).join("");
 }
 
 function closeRegister() {
-    if (sales.length === 0) return alert("No sales");
-    if (confirm("Close register? This clears report history.")) {
-        let csv = "Date,Time,Table,Total,Mode\n";
-        sales.forEach(s => csv += `${s.date},${s.time},${s.table},${s.total},${s.mode}\n`);
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = `Report_${new Date().toLocaleDateString()}.csv`;
-        a.click();
-        sales = [];
-        save();
-        renderReports();
-    }
+    let csv = "Date,Time,Table,Total,Mode\n";
+    sales.forEach(s => csv += `${s.date},${s.time},${s.table},${s.total},${s.mode}\n`);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    a.download = "Report.csv"; a.click();
+    sales = []; save(); renderReports();
 }
 
-function save() {
-    localStorage.setItem("fm_menu", JSON.stringify(menu));
-    localStorage.setItem("fm_tables", JSON.stringify(tables));
-    localStorage.setItem("fm_sales", JSON.stringify(sales));
+function printReceipt(type, data) {
+    const cart = data ? data.items : tables[activeTable];
+    const total = data ? data.total : cart.reduce((s, i) => s + (i.price * i.qty), 0);
+    const html = `<div style="font-family:monospace;width:80mm;padding:5px;"><h3>FOOD MOHALLA</h3><hr>${type}<br>Table: ${activeTable}<hr>${cart.map(i => `<div>${i.name} x${i.qty}</div>`).join("")}<hr>${type === 'BILL' ? `TOTAL: ₹${total}<br>Mode: ${data.mode}` : ''}</div>`;
+    const f = document.getElementById("print-frame");
+    f.contentWindow.document.open(); f.contentWindow.document.write(html); f.contentWindow.document.close(); f.contentWindow.print();
 }
 
-function openSplitModal() {
-    const total = parseInt(document.getElementById("total").innerText);
-    if (total <= 0) return;
-    document.getElementById("split-total-display").innerText = total;
-    document.getElementById("split-online").value = total;
-    document.getElementById("split-payment-modal").style.display = 'flex';
-}
-
-function closeSplitModal() {
-    document.getElementById("split-payment-modal").style.display = 'none';
-}
-
-// Check session
-if (sessionStorage.getItem("fm_auth") === "true") unlockApp();
+window.onload = () => { if (sessionStorage.getItem("fm_auth") === "true") unlockApp(); };
 </script>
 </body>
 </html>
