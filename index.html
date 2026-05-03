@@ -8,6 +8,7 @@
     <style>
         .active-tab { border-bottom: 4px solid #facc15; font-weight: bold; color: #facc15; }
         .active-table { background: #facc15 !important; color: black; font-weight: bold; transform: scale(1.05); }
+        .active-admin-tab { background: #111827; color: #fff; box-shadow: 0 8px 18px rgba(17,24,39,.15); }
         .hidden-section { display: none !important; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         @media print { .no-print { display: none; } }
@@ -16,7 +17,6 @@
 
 <body class="bg-gray-900 text-white flex flex-col h-screen overflow-hidden">
 
-<!-- Login Overlay -->
 <div id="login-overlay" class="fixed inset-0 bg-gray-950 z-[1000] flex flex-col items-center justify-center p-6">
     <div class="bg-white text-black p-8 rounded-3xl shadow-2xl w-full max-w-md text-center">
         <div class="text-6xl mb-4">🍕</div>
@@ -30,7 +30,6 @@
     </div>
 </div>
 
-<!-- Main Application -->
 <div id="main-app" class="hidden-section flex-col h-full">
     <div class="bg-red-700 p-3 flex justify-between items-center shadow-lg no-print">
         <div class="flex items-center gap-3">
@@ -80,7 +79,6 @@
     </div>
 </div>
 
-<!-- Modals -->
 <div id="split-payment-modal" class="hidden-section fixed inset-0 bg-black/90 flex items-center justify-center z-[2000] p-4 text-black">
     <div class="bg-white p-6 rounded-2xl w-full max-w-sm">
         <h3 class="text-xl font-bold mb-4 border-b pb-2">Split Bill</h3>
@@ -97,19 +95,22 @@
 </div>
 
 <div id="admin-modal" class="hidden-section fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] p-4 text-black">
-    <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-2xl overflow-hidden flex flex-col">
+    <div class="bg-white w-full max-w-5xl h-[90vh] rounded-2xl overflow-hidden flex flex-col shadow-2xl">
         <div class="p-4 bg-gray-800 text-white flex justify-between items-center">
-            <h2 class="text-xl font-bold">MANAGEMENT</h2>
-            <button onclick="toggleAdmin()" class="text-2xl">&times;</button>
-        </div>
-        <div class="flex flex-1 overflow-hidden">
-            <div class="w-48 bg-gray-100 border-r p-4 flex flex-col gap-2">
-                <button onclick="verifyOwnerAndShow('editor')" class="text-left p-3 rounded hover:bg-gray-200 font-bold">MENU EDITOR</button>
-                <button onclick="verifyOwnerAndShow('reports')" class="text-left p-3 rounded hover:bg-gray-200 font-bold">REPORTS</button>
+            <div>
+                <h2 class="text-xl font-bold">MANAGEMENT</h2>
+                <p class="text-xs text-gray-300">Menu editor and sales register</p>
             </div>
-            <div class="flex-1 p-6 overflow-y-auto">
+            <button onclick="toggleAdmin()" class="text-2xl leading-none">&times;</button>
+        </div>
+        <div class="flex flex-1 overflow-hidden min-h-0">
+            <div class="w-52 bg-gray-100 border-r p-4 flex flex-col gap-2">
+                <button id="admin-tab-editor" onclick="verifyOwnerAndShow('editor')" class="admin-tab text-left p-3 rounded-lg hover:bg-gray-200 font-bold transition">MENU EDITOR</button>
+                <button id="admin-tab-reports" onclick="verifyOwnerAndShow('reports')" class="admin-tab text-left p-3 rounded-lg hover:bg-gray-200 font-bold transition">SALES REPORT</button>
+            </div>
+            <div class="flex-1 p-6 overflow-y-auto bg-slate-50">
                 <div id="section-editor" class="admin-section hidden-section">
-                    <div class="grid grid-cols-2 gap-4 mb-8 p-4 border rounded-xl bg-gray-50">
+                    <div class="grid grid-cols-2 gap-4 mb-8 p-4 border rounded-xl bg-white">
                         <input id="new-name" placeholder="Item Name" class="border p-2 rounded">
                         <select id="new-cat" class="border p-2 rounded"></select>
                         <input id="new-price" type="number" placeholder="Price" class="border p-2 rounded">
@@ -119,9 +120,27 @@
                     <div id="inventory-list" class="space-y-1"></div>
                 </div>
                 <div id="section-reports" class="admin-section hidden-section">
-                    <div id="report-stats" class="grid grid-cols-3 gap-4 mb-6"></div>
-                    <div id="report-list" class="space-y-1"></div>
-                    <button onclick="closeRegister()" class="mt-4 w-full bg-red-600 text-white py-2 rounded font-bold">CLOSE REGISTER & DOWNLOAD CSV</button>
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
+                        <div>
+                            <h3 class="text-2xl font-black tracking-tight text-gray-900">Sales Report</h3>
+                            <p class="text-sm text-gray-500">Current register summary and completed bills</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="renderReports()" class="bg-white border border-gray-200 px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-100">Refresh</button>
+                            <button onclick="closeRegister()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-700">Close Register & CSV</button>
+                        </div>
+                    </div>
+                    <div id="report-stats" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"></div>
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        <div class="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] gap-2 bg-gray-900 text-white text-[11px] font-black uppercase tracking-wide px-4 py-3">
+                            <span>Time</span>
+                            <span>Table</span>
+                            <span>Mode</span>
+                            <span class="text-right">Items</span>
+                            <span class="text-right">Total</span>
+                        </div>
+                        <div id="report-list" class="divide-y divide-gray-100 max-h-[42vh] overflow-y-auto"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -131,13 +150,13 @@
 <iframe id="print-frame" style="display:none;"></iframe>
 
 <script>
-// --- CONFIG & STATE ---
 const AUTH_CONFIG = { user: "admin", pass: "admin123", ownerPass: "owner789" };
 const TABLES = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "P-1", "P-2"];
 const CATEGORIES = ["PIZZA", "PIZZA SIDES", "BURGER", "PASTA", "BURGIZZA", "SANDWICH", "FRY-O-CLOCK", "BITE BUDDIES", "MOCKTAILS", "SIP & CHILL", "SIZZLING & SWEET", "WAFFLE", "MOMOS", "COMBO", "OTHER"];
 
 let activeTable = TABLES[0];
 let activeCat = CATEGORIES[0];
+let ownerVerified = false;
 let menu = JSON.parse(localStorage.getItem("fm_menu")) || [
     { id: 1, name: "Single Cheese (R)", category: "PIZZA", price: 119, img: "https://images.unsplash.com/photo-1593560704563-f176a2eb61db?w=200" },
     { id: 16, name: "Aloo Tikki Burger", category: "BURGER", price: 69, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200" }
@@ -147,7 +166,6 @@ let sales = JSON.parse(localStorage.getItem("fm_sales")) || [];
 
 TABLES.forEach(t => { if (!tables[t]) tables[t] = []; });
 
-// --- AUTH ---
 function handleLogin() {
     const u = document.getElementById("login-user").value.trim();
     const p = document.getElementById("login-pass").value.trim();
@@ -178,7 +196,6 @@ function initSystem() {
     renderCart();
 }
 
-// --- UI RENDERING ---
 function renderTables() {
     document.getElementById("tables").innerHTML = TABLES.map(t => `
         <button onclick="setTable('${t}')" class="w-full py-4 rounded-xl transition text-sm ${t === activeTable ? 'active-table' : 'bg-gray-700 text-gray-300'}">
@@ -238,7 +255,6 @@ function renderCart() {
     document.getElementById("total").innerText = total;
 }
 
-// --- LOGIC ---
 function setTable(t) { activeTable = t; renderTables(); renderCart(); }
 function setCat(c) { activeCat = c; renderCats(); renderMenu(); }
 
@@ -275,7 +291,6 @@ function save() {
     localStorage.setItem("fm_sales", JSON.stringify(sales));
 }
 
-// --- BILLING & ADMIN ---
 function processQuickBill(mode) {
     const total = parseInt(document.getElementById("total").innerText);
     if (total <= 0) return alert("Cart is empty");
@@ -290,6 +305,7 @@ function openSplitModal() {
     const total = parseInt(document.getElementById("total").innerText);
     if (total <= 0) return;
     document.getElementById("split-total-display").innerText = total;
+    document.getElementById("split-cash").value = "";
     document.getElementById("split-online").value = total;
     document.getElementById("split-payment-modal").classList.remove("hidden-section");
 }
@@ -314,15 +330,33 @@ function submitSplitPayment() {
     save(); renderCart(); renderTables(); closeSplitModal();
 }
 
-function toggleAdmin() { document.getElementById("admin-modal").classList.toggle("hidden-section"); }
+function toggleAdmin() {
+    const modal = document.getElementById("admin-modal");
+    modal.classList.toggle("hidden-section");
+    if (!modal.classList.contains("hidden-section") && ownerVerified) {
+        showAdminSection("reports");
+    }
+}
 
 function verifyOwnerAndShow(sec) {
-    if (prompt("Owner Password:") === AUTH_CONFIG.ownerPass) {
-        document.querySelectorAll(".admin-section").forEach(s => s.classList.add("hidden-section"));
-        document.getElementById(`section-${sec}`).classList.remove("hidden-section");
-        if (sec === 'editor') renderInventory();
-        if (sec === 'reports') renderReports();
+    if (!ownerVerified) {
+        const pass = prompt("Owner Password:");
+        if (pass !== AUTH_CONFIG.ownerPass) {
+            alert("Invalid owner password");
+            return;
+        }
+        ownerVerified = true;
     }
+    showAdminSection(sec);
+}
+
+function showAdminSection(sec) {
+    document.querySelectorAll(".admin-section").forEach(s => s.classList.add("hidden-section"));
+    document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("active-admin-tab"));
+    document.getElementById(`section-${sec}`).classList.remove("hidden-section");
+    document.getElementById(`admin-tab-${sec}`).classList.add("active-admin-tab");
+    if (sec === 'editor') renderInventory();
+    if (sec === 'reports') renderReports();
 }
 
 function addItem() {
@@ -340,19 +374,69 @@ function renderInventory() {
 
 function deleteItem(id) { menu = menu.filter(m => m.id !== id); save(); renderInventory(); renderMenu(); }
 
+function getSoldItemCount() {
+    return sales.reduce((sum, sale) => sum + (sale.items || []).reduce((itemSum, item) => itemSum + (item.qty || 0), 0), 0);
+}
+
+function statCard(label, value, tone) {
+    const tones = {
+        green: "bg-emerald-50 border-emerald-200 text-emerald-700",
+        blue: "bg-sky-50 border-sky-200 text-sky-700",
+        amber: "bg-amber-50 border-amber-200 text-amber-700",
+        dark: "bg-gray-900 border-gray-900 text-white"
+    };
+    return `<div class="rounded-xl border ${tones[tone]} p-4">
+        <div class="text-[11px] uppercase tracking-wide font-black opacity-70">${label}</div>
+        <div class="text-2xl font-black mt-1">${value}</div>
+    </div>`;
+}
+
 function renderReports() {
     const cash = sales.reduce((a, b) => a + (b.cash || 0), 0);
     const online = sales.reduce((a, b) => a + (b.online || 0), 0);
-    document.getElementById("report-stats").innerHTML = `<div class="p-2 bg-green-100 text-black">Total: ₹${cash + online}</div><div class="p-2 bg-yellow-100 text-black">Cash: ₹${cash}</div><div class="p-2 bg-blue-100 text-black">Online: ₹${online}</div>`;
-    document.getElementById("report-list").innerHTML = sales.slice().reverse().map(s => `<div class="text-[10px] border-b p-1 text-black">${s.time} - ${s.table} - ₹${s.total} (${s.mode})</div>`).join("");
+    const total = cash + online;
+    const itemCount = getSoldItemCount();
+    document.getElementById("report-stats").innerHTML = [
+        statCard("Total Sales", `₹${total}`, "dark"),
+        statCard("Cash", `₹${cash}`, "green"),
+        statCard("Online", `₹${online}`, "blue"),
+        statCard("Items Sold", itemCount, "amber")
+    ].join("");
+
+    if (sales.length === 0) {
+        document.getElementById("report-list").innerHTML = `
+            <div class="p-8 text-center text-gray-400">
+                <div class="text-4xl mb-2">📊</div>
+                <div class="font-bold text-gray-600">No sales yet</div>
+                <div class="text-xs mt-1">Bills will appear here after Cash, Online, or Split payment.</div>
+            </div>`;
+        return;
+    }
+
+    document.getElementById("report-list").innerHTML = sales.slice().reverse().map(s => {
+        const qty = (s.items || []).reduce((sum, item) => sum + (item.qty || 0), 0);
+        const modeClass = s.mode === "Cash" ? "bg-emerald-100 text-emerald-700" : s.mode === "Online" ? "bg-sky-100 text-sky-700" : "bg-orange-100 text-orange-700";
+        return `<div class="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] gap-2 px-4 py-3 text-sm items-center text-gray-800 hover:bg-gray-50">
+            <span class="font-semibold">${s.time}</span>
+            <span>${s.table}</span>
+            <span><span class="px-2 py-1 rounded-full text-[11px] font-black ${modeClass}">${s.mode}</span></span>
+            <span class="text-right font-bold">${qty}</span>
+            <span class="text-right font-black">₹${s.total}</span>
+        </div>`;
+    }).join("");
 }
 
 function closeRegister() {
-    let csv = "Date,Time,Table,Total,Mode\n";
-    sales.forEach(s => csv += `${s.date},${s.time},${s.table},${s.total},${s.mode}\n`);
+    if (sales.length === 0) return alert("No sales to download");
+    let csv = "Date,Time,Table,Total,Cash,Online,Mode,Items\n";
+    sales.forEach(s => {
+        const itemText = (s.items || []).map(i => `${i.name} x${i.qty}`).join(" | ");
+        csv += `"${s.date}","${s.time}","${s.table}",${s.total},${s.cash || 0},${s.online || 0},"${s.mode}","${itemText}"\n`;
+    });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-    a.download = "Report.csv"; a.click();
+    a.download = "Food-Mohalla-Sales-Report.csv";
+    a.click();
     sales = []; save(); renderReports();
 }
 
