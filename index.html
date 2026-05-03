@@ -69,7 +69,7 @@
 
         <div class="flex-1 flex flex-col bg-gray-100 text-black no-print">
             <div class="bg-white shadow-sm p-4 border-b">
-                <div id="cats" class="flex gap-4 overflow-x-auto scrollbar-hide whitespace-nowrap px-2 mb-3"></div>
+                <div id="cats" class="flex flex-wrap gap-3 overflow-y-auto px-2 mb-3 max-h-24"></div>
                 <div class="relative w-full">
                     <span class="absolute left-3 top-2 text-gray-400">🔍</span>
                     <input id="menu-search" type="text" oninput="renderMenu()" placeholder="Search items..." class="w-full pl-9 pr-4 py-2 border-2 border-gray-100 rounded-xl focus:border-red-500 outline-none text-sm">
@@ -134,7 +134,7 @@
 // --- CONFIG & STATE ---
 const AUTH_CONFIG = { user: "admin", pass: "admin123", ownerPass: "owner789" };
 const TABLES = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "P-1", "P-2"];
-const CATEGORIES = ["PIZZA", "PIZZA SIDES", "BURGER", "PASTA", "BURGIZZA", "SANDWICH", "FRY-O-CLOCK", "BITE BUDDIES", "MOCKTAILS", "SIP & CHILL", "SIZZLING & SWEET","WAFFLE","MOMOS","COMBO","OTHER"];
+const CATEGORIES = ["PIZZA", "PIZZA SIDES", "BURGER", "PASTA", "BURGIZZA", "SANDWICH", "FRY-O-CLOCK", "BITE BUDDIES", "MOCKTAILS", "SIP & CHILL", "SIZZLING & SWEET", "WAFFLE", "MOMOS", "COMBO", "OTHER"];
 
 let activeTable = TABLES[0];
 let activeCat = CATEGORIES[0];
@@ -190,7 +190,7 @@ function renderTables() {
 
 function renderCats() {
     document.getElementById("cats").innerHTML = CATEGORIES.map(c => `
-        <button onclick="setCat('${c}')" class="pb-2 transition-all ${c === activeCat ? 'active-tab' : 'text-gray-400'} font-bold uppercase text-xs">
+        <button onclick="setCat('${c}')" class="pb-2 px-1 transition-all ${c === activeCat ? 'active-tab' : 'text-gray-400'} font-bold uppercase text-xs">
             ${c}
         </button>
     `).join("");
@@ -320,8 +320,8 @@ function verifyOwnerAndShow(sec) {
     if (prompt("Owner Password:") === AUTH_CONFIG.ownerPass) {
         document.querySelectorAll(".admin-section").forEach(s => s.classList.add("hidden-section"));
         document.getElementById(`section-${sec}`).classList.remove("hidden-section");
-        if(sec === 'editor') renderInventory();
-        if(sec === 'reports') renderReports();
+        if (sec === 'editor') renderInventory();
+        if (sec === 'reports') renderReports();
     }
 }
 
@@ -343,7 +343,7 @@ function deleteItem(id) { menu = menu.filter(m => m.id !== id); save(); renderIn
 function renderReports() {
     const cash = sales.reduce((a, b) => a + (b.cash || 0), 0);
     const online = sales.reduce((a, b) => a + (b.online || 0), 0);
-    document.getElementById("report-stats").innerHTML = `<div class="p-2 bg-green-100 text-black">Total: ₹${cash+online}</div><div class="p-2 bg-yellow-100 text-black">Cash: ₹${cash}</div><div class="p-2 bg-blue-100 text-black">Online: ₹${online}</div>`;
+    document.getElementById("report-stats").innerHTML = `<div class="p-2 bg-green-100 text-black">Total: ₹${cash + online}</div><div class="p-2 bg-yellow-100 text-black">Cash: ₹${cash}</div><div class="p-2 bg-blue-100 text-black">Online: ₹${online}</div>`;
     document.getElementById("report-list").innerHTML = sales.slice().reverse().map(s => `<div class="text-[10px] border-b p-1 text-black">${s.time} - ${s.table} - ₹${s.total} (${s.mode})</div>`).join("");
 }
 
@@ -359,9 +359,68 @@ function closeRegister() {
 function printReceipt(type, data) {
     const cart = data ? data.items : tables[activeTable];
     const total = data ? data.total : cart.reduce((s, i) => s + (i.price * i.qty), 0);
-    const html = `<div style="font-family:monospace;width:80mm;padding:5px;"><h3>FOOD MOHALLA</h3><hr>${type}<br>Table: ${activeTable}<hr>${cart.map(i => `<div>${i.name} x${i.qty}</div>`).join("")}<hr>${type === 'BILL' ? `TOTAL: ₹${total}<br>Mode: ${data.mode}` : ''}</div>`;
+    const receiptTable = data?.table || activeTable;
+    const html = `
+        <html>
+        <head>
+            <style>
+                body {
+                    font-family: monospace;
+                    width: 80mm;
+                    padding: 8px;
+                    margin: 0;
+                    font-size: 18px;
+                    line-height: 1.5;
+                    color: #000;
+                }
+                h3 {
+                    margin: 0 0 8px;
+                    text-align: center;
+                    font-size: 24px;
+                }
+                .label {
+                    font-size: 20px;
+                    font-weight: bold;
+                    text-align: center;
+                    margin: 8px 0;
+                }
+                .meta, .item, .total {
+                    margin: 6px 0;
+                }
+                .item {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 8px;
+                }
+                .total {
+                    font-size: 22px;
+                    font-weight: bold;
+                }
+                hr {
+                    border: 0;
+                    border-top: 1px dashed #000;
+                    margin: 8px 0;
+                }
+            </style>
+        </head>
+        <body>
+            <h3>FOOD MOHALLA</h3>
+            <hr>
+            <div class="label">${type}</div>
+            <div class="meta">Table: ${receiptTable}</div>
+            <hr>
+            ${cart.map(i => `<div class="item"><span>${i.name} x${i.qty}</span><span>Rs ${i.price * i.qty}</span></div>`).join("")}
+            <hr>
+            ${type === 'BILL' ? `<div class="total">TOTAL: Rs ${total}</div><div class="meta">Mode: ${data.mode}</div>` : ''}
+        </body>
+        </html>
+    `;
     const f = document.getElementById("print-frame");
-    f.contentWindow.document.open(); f.contentWindow.document.write(html); f.contentWindow.document.close(); f.contentWindow.print();
+    f.contentWindow.document.open();
+    f.contentWindow.document.write(html);
+    f.contentWindow.document.close();
+    f.contentWindow.focus();
+    f.contentWindow.print();
 }
 
 window.onload = () => { if (sessionStorage.getItem("fm_auth") === "true") unlockApp(); };
