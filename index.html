@@ -25,7 +25,7 @@
             <input id="login-user" type="text" class="w-full border-2 p-3 rounded-xl outline-none focus:border-red-500" placeholder="Username" autocomplete="off">
             <input id="login-pass" type="password" class="w-full border-2 p-3 rounded-xl outline-none focus:border-red-500" placeholder="Password" autocomplete="off">
             <button onclick="handleLogin()" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-xl shadow-lg transition-all active:scale-95">UNLOCK SYSTEM</button>
-            <p id="login-error" class="text-red-500 text-center text-sm font-bold hidden mt-2">❌ Invalid Login</p>
+            <p id="login-error" class="text-red-500 text-center text-sm font-bold hidden mt-2">Invalid Login</p>
         </div>
     </div>
 </div>
@@ -53,11 +53,25 @@
             <div id="cart" class="flex-1 p-4 overflow-y-auto space-y-3"></div>
 
             <div class="p-4 bg-gray-900 text-white">
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-gray-400">Total</span>
-                    <span class="text-3xl font-bold text-yellow-400">₹<span id="total">0</span></span>
+                <div class="rounded-xl bg-white/5 border border-white/10 p-3 mb-4 space-y-3">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-400">Subtotal</span>
+                        <span class="font-bold">Rs <span id="subtotal">0</span></span>
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                        <label for="discount" class="text-gray-400 text-sm font-semibold">Discount</label>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs uppercase tracking-wide text-yellow-300">Rs</span>
+                            <input id="discount" type="number" min="0" oninput="updateDiscount()" class="w-24 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-right font-bold text-white outline-none focus:border-yellow-400" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-white/10">
+                        <span class="text-gray-400">Total</span>
+                        <span class="text-3xl font-bold text-yellow-400">Rs <span id="total">0</span></span>
+                    </div>
                 </div>
-                <button onclick="printReceipt('KOT')" class="w-full bg-indigo-600 hover:bg-indigo-700 py-3 rounded-lg font-bold mb-2 shadow-md">📋 PRINT KOT</button>
+                <button id="kot-button" onclick="printReceipt('KOT')" class="w-full bg-indigo-600 hover:bg-indigo-700 py-3 rounded-lg font-bold mb-1 shadow-md">📋 PRINT KOT</button>
+                <div id="kot-helper" class="text-[11px] text-center text-gray-400 mb-2 hidden">Only updated items will print for kitchen</div>
                 <div class="grid grid-cols-2 gap-2 mb-2">
                     <button onclick="processQuickBill('Cash')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg font-bold shadow-md">💰 CASH</button>
                     <button onclick="processQuickBill('Online')" class="bg-sky-600 hover:bg-sky-700 text-white py-3 rounded-lg font-bold shadow-md">💳 ONLINE</button>
@@ -83,7 +97,7 @@
     <div class="bg-white p-6 rounded-2xl w-full max-w-sm">
         <h3 class="text-xl font-bold mb-4 border-b pb-2">Split Bill</h3>
         <div class="mb-4 rounded-lg bg-orange-50 border border-orange-200 px-4 py-3 font-bold text-orange-700">
-            Total: ₹<span id="split-total-display">0</span>
+            Total: Rs <span id="split-total-display">0</span>
         </div>
         <input id="split-cash" type="number" oninput="calculateSplit()" class="w-full border-2 p-3 rounded-lg font-bold mb-3" placeholder="Cash Amount">
         <input id="split-online" type="number" readonly class="w-full border-2 bg-blue-50 p-3 rounded-lg font-bold text-blue-600 mb-4" placeholder="Online Amount">
@@ -95,22 +109,19 @@
 </div>
 
 <div id="admin-modal" class="hidden-section fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] p-4 text-black">
-    <div class="bg-white w-full max-w-5xl h-[90vh] rounded-2xl overflow-hidden flex flex-col shadow-2xl">
+    <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-2xl overflow-hidden flex flex-col">
         <div class="p-4 bg-gray-800 text-white flex justify-between items-center">
-            <div>
-                <h2 class="text-xl font-bold">MANAGEMENT</h2>
-                <p class="text-xs text-gray-300">Menu editor and sales register</p>
-            </div>
-            <button onclick="toggleAdmin()" class="text-2xl leading-none">&times;</button>
+            <h2 class="text-xl font-bold">MANAGEMENT</h2>
+            <button onclick="toggleAdmin()" class="text-2xl">&times;</button>
         </div>
-        <div class="flex flex-1 overflow-hidden min-h-0">
-            <div class="w-52 bg-gray-100 border-r p-4 flex flex-col gap-2">
-                <button id="admin-tab-editor" onclick="verifyOwnerAndShow('editor')" class="admin-tab text-left p-3 rounded-lg hover:bg-gray-200 font-bold transition">MENU EDITOR</button>
-                <button id="admin-tab-reports" onclick="verifyOwnerAndShow('reports')" class="admin-tab text-left p-3 rounded-lg hover:bg-gray-200 font-bold transition">SALES REPORT</button>
+        <div class="flex flex-1 overflow-hidden">
+            <div class="w-48 bg-gray-100 border-r p-4 flex flex-col gap-2">
+                <button id="admin-tab-editor" onclick="verifyOwnerAndShow('editor')" class="admin-tab text-left p-3 rounded hover:bg-gray-200 font-bold">MENU EDITOR</button>
+                <button id="admin-tab-reports" onclick="verifyOwnerAndShow('reports')" class="admin-tab text-left p-3 rounded hover:bg-gray-200 font-bold">REPORTS</button>
             </div>
-            <div class="flex-1 p-6 overflow-y-auto bg-slate-50">
+            <div class="flex-1 p-6 overflow-y-auto">
                 <div id="section-editor" class="admin-section hidden-section">
-                    <div class="grid grid-cols-2 gap-4 mb-8 p-4 border rounded-xl bg-white">
+                    <div class="grid grid-cols-2 gap-4 mb-8 p-4 border rounded-xl bg-gray-50">
                         <input id="new-name" placeholder="Item Name" class="border p-2 rounded">
                         <select id="new-cat" class="border p-2 rounded"></select>
                         <input id="new-price" type="number" placeholder="Price" class="border p-2 rounded">
@@ -120,26 +131,42 @@
                     <div id="inventory-list" class="space-y-1"></div>
                 </div>
                 <div id="section-reports" class="admin-section hidden-section">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
                         <div>
-                            <h3 class="text-2xl font-black tracking-tight text-gray-900">Sales Report</h3>
-                            <p class="text-sm text-gray-500">Current register summary and completed bills</p>
+                            <h3 class="text-2xl font-black tracking-tight text-gray-900">Day Wise Reports</h3>
+                            <p class="text-sm text-gray-500">Daily sales, top items, category movement and register history</p>
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex flex-wrap gap-2">
+                            <input id="report-date" type="date" onchange="renderReports()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm font-bold">
+                            <button onclick="setTodayReport()" class="bg-white border border-gray-200 px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-100">Today</button>
                             <button onclick="renderReports()" class="bg-white border border-gray-200 px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-100">Refresh</button>
-                            <button onclick="closeRegister()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-700">Close Register & CSV</button>
+                            <button onclick="closeRegister()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-700">Download Day CSV</button>
                         </div>
                     </div>
-                    <div id="report-stats" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"></div>
-                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                        <div class="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] gap-2 bg-gray-900 text-white text-[11px] font-black uppercase tracking-wide px-4 py-3">
+                    <div id="report-stats" class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6"></div>
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-white border border-gray-200 rounded-xl p-4">
+                            <h4 class="text-sm font-black uppercase tracking-wide text-gray-700 mb-3">Top Selling Items</h4>
+                            <div id="top-items" class="space-y-2"></div>
+                        </div>
+                        <div class="bg-white border border-gray-200 rounded-xl p-4">
+                            <h4 class="text-sm font-black uppercase tracking-wide text-gray-700 mb-3">Category Summary</h4>
+                            <div id="category-summary" class="space-y-2"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 mb-6">
+                        <h4 class="text-sm font-black uppercase tracking-wide text-gray-700 mb-3">Register Snapshot</h4>
+                        <div id="report-register" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                        <div class="grid grid-cols-[90px_90px_1fr_90px_110px] gap-2 bg-gray-900 text-white text-[11px] font-black uppercase tracking-wide px-4 py-3">
+                            <span>Bill</span>
                             <span>Time</span>
-                            <span>Table</span>
-                            <span>Mode</span>
+                            <span>Table / Type</span>
                             <span class="text-right">Items</span>
                             <span class="text-right">Total</span>
                         </div>
-                        <div id="report-list" class="divide-y divide-gray-100 max-h-[42vh] overflow-y-auto"></div>
+                        <div id="report-list" class="divide-y divide-gray-100"></div>
                     </div>
                 </div>
             </div>
@@ -163,8 +190,16 @@ let menu = JSON.parse(localStorage.getItem("fm_menu")) || [
 ];
 let tables = JSON.parse(localStorage.getItem("fm_tables")) || {};
 let sales = JSON.parse(localStorage.getItem("fm_sales")) || [];
+let discounts = JSON.parse(localStorage.getItem("fm_discounts")) || {};
 
-TABLES.forEach(t => { if (!tables[t]) tables[t] = []; });
+TABLES.forEach(t => {
+    if (!tables[t]) tables[t] = [];
+    if (typeof discounts[t] !== "number") discounts[t] = 0;
+    tables[t] = tables[t].map(item => ({
+        ...item,
+        kotPrintedQty: Number.isFinite(item.kotPrintedQty) ? item.kotPrintedQty : 0
+    }));
+});
 
 function handleLogin() {
     const u = document.getElementById("login-user").value.trim();
@@ -190,16 +225,29 @@ function logout() {
 }
 
 function initSystem() {
+    ensureReportDateInput();
     renderTables();
     renderCats();
     renderMenu();
     renderCart();
 }
 
+function ensureReportDateInput() {
+    const input = document.getElementById("report-date");
+    if (input && !input.value) input.value = getBusinessDate();
+}
+
+function setTodayReport() {
+    const input = document.getElementById("report-date");
+    if (!input) return;
+    input.value = getBusinessDate();
+    renderReports();
+}
+
 function renderTables() {
     document.getElementById("tables").innerHTML = TABLES.map(t => `
         <button onclick="setTable('${t}')" class="w-full py-4 rounded-xl transition text-sm ${t === activeTable ? 'active-table' : 'bg-gray-700 text-gray-300'}">
-            ${t}${tables[t].length > 0 ? ' ●' : ''}
+            ${t}${tables[t].length > 0 ? ' *' : ''}
         </button>
     `).join("");
     document.getElementById("table-name").innerText = activeTable;
@@ -221,24 +269,70 @@ function renderMenu() {
     document.getElementById("menu").innerHTML = filtered.map(m => `
         <div onclick="addCart(${m.id})" class="bg-white p-3 rounded-2xl shadow-sm border active:scale-95 transition cursor-pointer">
             <div class="h-24 bg-gray-100 rounded-xl mb-2 overflow-hidden">
-                <img src="${m.img}" class="w-full h-full object-cover">
+                <img src="${m.img}" class="w-full h-full object-cover" alt="${m.name}">
             </div>
             <h3 class="font-bold text-xs truncate text-black">${m.name}</h3>
-            <p class="text-red-600 font-black text-sm">₹${m.price}</p>
+            <p class="text-red-600 font-black text-sm">Rs ${m.price}</p>
         </div>
     `).join("");
 }
 
+function getCartSubtotal(tableName = activeTable) {
+    return (tables[tableName] || []).reduce((sum, item) => sum + (item.price * item.qty), 0);
+}
+
+function getTableDiscount(tableName = activeTable) {
+    const subtotal = getCartSubtotal(tableName);
+    return Math.max(0, Math.min(discounts[tableName] || 0, subtotal));
+}
+
+function getCartTotal(tableName = activeTable) {
+    return getCartSubtotal(tableName) - getTableDiscount(tableName);
+}
+
+function hasPrintedKot(tableName = activeTable) {
+    return (tables[tableName] || []).some(item => (item.kotPrintedQty || 0) > 0);
+}
+
+function hasPendingKot(tableName = activeTable) {
+    return (tables[tableName] || []).some(item => item.qty > (item.kotPrintedQty || 0));
+}
+
+function getKotButtonLabel(tableName = activeTable) {
+    if (!hasPrintedKot(tableName)) return "📋 PRINT KOT";
+    if (hasPendingKot(tableName)) return "📋 PRINT PENDING KOT";
+    return "📋 PRINT KOT";
+}
+
+function updateKotButton() {
+    const button = document.getElementById("kot-button");
+    const helper = document.getElementById("kot-helper");
+    if (!button || !helper) return;
+    const pendingMode = hasPrintedKot(activeTable) && hasPendingKot(activeTable);
+    button.innerText = getKotButtonLabel(activeTable);
+    helper.classList.toggle("hidden", !pendingMode);
+}
+
+function getReceiptTableLabel(tableName) {
+    if (tableName === "P-1") return "PARCEL";
+    if (tableName === "P-2") return "TAKEAWAY";
+    return tableName;
+}
+
+function getOrderTypeLabel(tableName) {
+    if (tableName === "P-1") return "PARCEL";
+    if (tableName === "P-2") return "TAKEAWAY";
+    return "DINE IN";
+}
+
 function renderCart() {
-    let total = 0;
     const cart = tables[activeTable];
     const container = document.getElementById("cart");
+
     if (cart.length === 0) {
         container.innerHTML = '<div class="text-center mt-20 text-gray-400 italic">No Items</div>';
     } else {
-        container.innerHTML = cart.map(item => {
-            total += item.price * item.qty;
-            return `
+        container.innerHTML = cart.map(item => `
             <div class="flex justify-between items-center border-b pb-2 text-black">
                 <div class="flex-1 font-bold text-sm">${item.name}</div>
                 <div class="flex items-center gap-3">
@@ -247,87 +341,173 @@ function renderCart() {
                         <span class="w-6 text-center text-xs font-bold">${item.qty}</span>
                         <button onclick="inc(${item.id})" class="w-7 h-7 flex items-center justify-center text-green-500 font-bold">+</button>
                     </div>
-                    <span class="w-16 text-right font-black">₹${item.price * item.qty}</span>
+                    <span class="w-16 text-right font-black">Rs ${item.price * item.qty}</span>
                 </div>
-            </div>`;
-        }).join("");
+            </div>
+        `).join("");
     }
-    document.getElementById("total").innerText = total;
+
+    document.getElementById("subtotal").innerText = getCartSubtotal(activeTable);
+    document.getElementById("discount").value = getTableDiscount(activeTable);
+    document.getElementById("total").innerText = getCartTotal(activeTable);
+    updateKotButton();
 }
 
-function setTable(t) { activeTable = t; renderTables(); renderCart(); }
-function setCat(c) { activeCat = c; renderCats(); renderMenu(); }
+function setTable(t) {
+    activeTable = t;
+    renderTables();
+    renderCart();
+}
+
+function setCat(c) {
+    activeCat = c;
+    renderCats();
+    renderMenu();
+}
 
 function addCart(id) {
     const item = menu.find(m => m.id === id);
     if (!item) return;
     const existing = tables[activeTable].find(i => i.id === id);
-    if (existing) existing.qty++;
-    else tables[activeTable].push({ ...item, qty: 1 });
-    save(); renderCart(); renderTables();
+    if (existing) {
+        existing.qty++;
+    } else {
+        tables[activeTable].push({ ...item, qty: 1, kotPrintedQty: 0 });
+    }
+    save();
+    renderCart();
+    renderTables();
 }
 
 function inc(id) {
     const item = tables[activeTable].find(i => i.id === id);
-    if (item) item.qty++;
-    save(); renderCart();
+    if (!item) return;
+    item.qty++;
+    save();
+    renderCart();
 }
 
 function dec(id) {
     const idx = tables[activeTable].findIndex(i => i.id === id);
     if (idx === -1) return;
-    if (tables[activeTable][idx].qty > 1) tables[activeTable][idx].qty--;
-    else tables[activeTable].splice(idx, 1);
-    save(); renderCart(); renderTables();
+    if (tables[activeTable][idx].qty > 1) {
+        tables[activeTable][idx].qty--;
+    } else {
+        tables[activeTable].splice(idx, 1);
+    }
+    save();
+    renderCart();
+    renderTables();
 }
 
 function clearTable() {
-    if (confirm("Clear Table?")) { tables[activeTable] = []; save(); renderCart(); renderTables(); }
+    if (!confirm("Clear Table?")) return;
+    tables[activeTable] = [];
+    discounts[activeTable] = 0;
+    save();
+    renderCart();
+    renderTables();
+}
+
+function updateDiscount() {
+    const input = document.getElementById("discount");
+    let discount = parseInt(input.value, 10) || 0;
+    if (discount < 0) discount = 0;
+    const subtotal = getCartSubtotal(activeTable);
+    if (discount > subtotal) discount = subtotal;
+    discounts[activeTable] = discount;
+    input.value = discount;
+    save();
+    renderCart();
 }
 
 function save() {
     localStorage.setItem("fm_menu", JSON.stringify(menu));
     localStorage.setItem("fm_tables", JSON.stringify(tables));
     localStorage.setItem("fm_sales", JSON.stringify(sales));
+    localStorage.setItem("fm_discounts", JSON.stringify(discounts));
 }
 
 function processQuickBill(mode) {
-    const total = parseInt(document.getElementById("total").innerText);
+    const total = getCartTotal(activeTable);
     if (total <= 0) return alert("Cart is empty");
-    const sale = { total, cash: mode === 'Cash' ? total : 0, online: mode === 'Online' ? total : 0, mode, items: [...tables[activeTable]], table: activeTable, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() };
+
+    const sale = {
+        billNo: getNextBillNumber(),
+        businessDate: getBusinessDate(),
+        subtotal: getCartSubtotal(activeTable),
+        discount: getTableDiscount(activeTable),
+        total,
+        cash: mode === "Cash" ? total : 0,
+        online: mode === "Online" ? total : 0,
+        mode,
+        items: tables[activeTable].map(item => ({ ...item })),
+        table: activeTable,
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString()
+    };
+
     sales.push(sale);
-    printReceipt('BILL', sale);
+    printReceipt("BILL", sale);
     tables[activeTable] = [];
-    save(); renderCart(); renderTables();
+    discounts[activeTable] = 0;
+    save();
+    renderCart();
+    renderTables();
 }
 
 function openSplitModal() {
-    const total = parseInt(document.getElementById("total").innerText);
-    if (total <= 0) return;
+    const total = getCartTotal(activeTable);
+    if (total <= 0) return alert("Cart is empty");
     document.getElementById("split-total-display").innerText = total;
     document.getElementById("split-cash").value = "";
     document.getElementById("split-online").value = total;
     document.getElementById("split-payment-modal").classList.remove("hidden-section");
 }
 
-function closeSplitModal() { document.getElementById("split-payment-modal").classList.add("hidden-section"); }
+function closeSplitModal() {
+    document.getElementById("split-payment-modal").classList.add("hidden-section");
+}
 
 function calculateSplit() {
-    const total = parseInt(document.getElementById("total").innerText);
-    let cash = parseInt(document.getElementById("split-cash").value) || 0;
-    if (cash > total) { cash = total; document.getElementById("split-cash").value = total; }
+    const total = getCartTotal(activeTable);
+    let cash = parseInt(document.getElementById("split-cash").value, 10) || 0;
+    if (cash > total) {
+        cash = total;
+        document.getElementById("split-cash").value = total;
+    }
     document.getElementById("split-online").value = total - cash;
 }
 
 function submitSplitPayment() {
-    const total = parseInt(document.getElementById("total").innerText);
-    const cash = parseInt(document.getElementById("split-cash").value) || 0;
-    const online = parseInt(document.getElementById("split-online").value) || 0;
-    const sale = { total, cash, online, mode: 'Split', items: [...tables[activeTable]], table: activeTable, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() };
+    const total = getCartTotal(activeTable);
+    const cash = parseInt(document.getElementById("split-cash").value, 10) || 0;
+    const online = parseInt(document.getElementById("split-online").value, 10) || 0;
+    if (cash + online !== total) return alert("Split amount total se match nahi kar raha");
+
+    const sale = {
+        billNo: getNextBillNumber(),
+        businessDate: getBusinessDate(),
+        subtotal: getCartSubtotal(activeTable),
+        discount: getTableDiscount(activeTable),
+        total,
+        cash,
+        online,
+        mode: "Split",
+        items: tables[activeTable].map(item => ({ ...item })),
+        table: activeTable,
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString()
+    };
+
     sales.push(sale);
-    printReceipt('BILL', sale);
+    printReceipt("BILL", sale);
     tables[activeTable] = [];
-    save(); renderCart(); renderTables(); closeSplitModal();
+    discounts[activeTable] = 0;
+    save();
+    renderCart();
+    renderTables();
+    closeSplitModal();
 }
 
 function toggleAdmin() {
@@ -352,132 +532,339 @@ function verifyOwnerAndShow(sec) {
 
 function showAdminSection(sec) {
     document.querySelectorAll(".admin-section").forEach(s => s.classList.add("hidden-section"));
-    document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("active-admin-tab"));
+    document.querySelectorAll(".admin-tab").forEach(tab => tab.classList.remove("active-admin-tab"));
     document.getElementById(`section-${sec}`).classList.remove("hidden-section");
-    document.getElementById(`admin-tab-${sec}`).classList.add("active-admin-tab");
-    if (sec === 'editor') renderInventory();
-    if (sec === 'reports') renderReports();
+    const activeTab = document.getElementById(`admin-tab-${sec}`);
+    if (activeTab) activeTab.classList.add("active-admin-tab");
+    if (sec === "editor") renderInventory();
+    if (sec === "reports") renderReports();
 }
 
 function addItem() {
-    const name = document.getElementById("new-name").value;
-    const price = parseInt(document.getElementById("new-price").value);
+    const name = document.getElementById("new-name").value.trim();
+    const price = parseInt(document.getElementById("new-price").value, 10);
     const cat = document.getElementById("new-cat").value;
-    if (!name || isNaN(price)) return alert("Invalid Data");
-    menu.push({ id: Date.now(), name, category: cat, price, img: document.getElementById("new-img").value || "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200" });
-    save(); renderMenu(); renderInventory();
+    if (!name || Number.isNaN(price)) return alert("Invalid Data");
+    menu.push({
+        id: Date.now(),
+        name,
+        category: cat,
+        price,
+        img: document.getElementById("new-img").value || "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200"
+    });
+    save();
+    renderMenu();
+    renderInventory();
 }
 
 function renderInventory() {
-    document.getElementById("inventory-list").innerHTML = menu.map(m => `<div class="flex justify-between p-2 border mb-1 bg-white text-black text-xs"><span>${m.name} (₹${m.price})</span><button onclick="deleteItem(${m.id})" class="text-red-500">Delete</button></div>`).join("");
+    document.getElementById("inventory-list").innerHTML = menu.map(m => `
+        <div class="flex justify-between p-2 border mb-1 bg-white text-black text-xs">
+            <span>${m.name} (Rs ${m.price})</span>
+            <button onclick="deleteItem(${m.id})" class="text-red-500">Delete</button>
+        </div>
+    `).join("");
 }
 
-function deleteItem(id) { menu = menu.filter(m => m.id !== id); save(); renderInventory(); renderMenu(); }
-
-function getSoldItemCount() {
-    return sales.reduce((sum, sale) => sum + (sale.items || []).reduce((itemSum, item) => itemSum + (item.qty || 0), 0), 0);
+function deleteItem(id) {
+    menu = menu.filter(m => m.id !== id);
+    save();
+    renderInventory();
+    renderMenu();
 }
 
-function statCard(label, value, tone) {
+function getSelectedReportDate() {
+    const input = document.getElementById("report-date");
+    return input?.value || getBusinessDate();
+}
+
+function normalizeSaleDate(sale) {
+    if (sale.businessDate) return sale.businessDate;
+    if (typeof sale.date === "string") {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(sale.date)) return sale.date;
+        const slashMatch = sale.date.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if (slashMatch) {
+            const [, a, b, y] = slashMatch;
+            const first = Number(a);
+            const second = Number(b);
+            const day = first > 12 ? first : second;
+            const month = first > 12 ? second : first;
+            return `${y}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        }
+        const dashMatch = sale.date.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+        if (dashMatch) {
+            const [, d, m, y] = dashMatch;
+            return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+        }
+    }
+    return getBusinessDate();
+}
+
+function getSalesForDate(dateStr) {
+    return sales.filter(sale => normalizeSaleDate(sale) === dateStr);
+}
+
+function summarizeItems(daySales) {
+    const itemMap = {};
+    daySales.forEach(sale => {
+        (sale.items || []).forEach(item => {
+            if (!itemMap[item.name]) {
+                itemMap[item.name] = { name: item.name, qty: 0, amount: 0, category: item.category || "OTHER" };
+            }
+            itemMap[item.name].qty += item.qty || 0;
+            itemMap[item.name].amount += (item.price || 0) * (item.qty || 0);
+        });
+    });
+    return Object.values(itemMap).sort((a, b) => b.qty - a.qty || b.amount - a.amount);
+}
+
+function summarizeCategories(daySales) {
+    const categoryMap = {};
+    daySales.forEach(sale => {
+        (sale.items || []).forEach(item => {
+            const category = item.category || "OTHER";
+            if (!categoryMap[category]) categoryMap[category] = { category, qty: 0, amount: 0 };
+            categoryMap[category].qty += item.qty || 0;
+            categoryMap[category].amount += (item.price || 0) * (item.qty || 0);
+        });
+    });
+    return Object.values(categoryMap).sort((a, b) => b.qty - a.qty || b.amount - a.amount);
+}
+
+function statBox(label, value, tone = "dark") {
     const tones = {
-        green: "bg-emerald-50 border-emerald-200 text-emerald-700",
-        blue: "bg-sky-50 border-sky-200 text-sky-700",
-        amber: "bg-amber-50 border-amber-200 text-amber-700",
-        dark: "bg-gray-900 border-gray-900 text-white"
+        dark: "bg-gray-900 text-white border-gray-900",
+        green: "bg-emerald-50 text-emerald-700 border-emerald-200",
+        blue: "bg-sky-50 text-sky-700 border-sky-200",
+        amber: "bg-amber-50 text-amber-700 border-amber-200"
     };
-    return `<div class="rounded-xl border ${tones[tone]} p-4">
-        <div class="text-[11px] uppercase tracking-wide font-black opacity-70">${label}</div>
-        <div class="text-2xl font-black mt-1">${value}</div>
-    </div>`;
+    return `
+        <div class="rounded-xl border ${tones[tone]} p-4">
+            <div class="text-[11px] uppercase tracking-wide font-black opacity-70">${label}</div>
+            <div class="text-2xl font-black mt-1">${value}</div>
+        </div>
+    `;
 }
 
 function renderReports() {
-    const cash = sales.reduce((a, b) => a + (b.cash || 0), 0);
-    const online = sales.reduce((a, b) => a + (b.online || 0), 0);
-    const total = cash + online;
-    const itemCount = getSoldItemCount();
+    ensureReportDateInput();
+    const selectedDate = getSelectedReportDate();
+    const daySales = getSalesForDate(selectedDate);
+    const cash = daySales.reduce((sum, sale) => sum + (sale.cash || 0), 0);
+    const online = daySales.reduce((sum, sale) => sum + (sale.online || 0), 0);
+    const discount = daySales.reduce((sum, sale) => sum + (sale.discount || 0), 0);
+    const total = daySales.reduce((sum, sale) => sum + (sale.total || 0), 0);
+    const totalItems = daySales.reduce((sum, sale) => sum + (sale.items || []).reduce((itemSum, item) => itemSum + (item.qty || 0), 0), 0);
+    const dineInBills = daySales.filter(sale => /^T\d+/i.test(sale.table || "")).length;
+    const parcelBills = daySales.filter(sale => sale.table === "P-1").length;
+    const takeawayBills = daySales.filter(sale => sale.table === "P-2").length;
+    const topItems = summarizeItems(daySales);
+    const categories = summarizeCategories(daySales);
+
     document.getElementById("report-stats").innerHTML = [
-        statCard("Total Sales", `₹${total}`, "dark"),
-        statCard("Cash", `₹${cash}`, "green"),
-        statCard("Online", `₹${online}`, "blue"),
-        statCard("Items Sold", itemCount, "amber")
+        statBox("Total Sales", `Rs ${total}`, "dark"),
+        statBox("Bills", daySales.length, "green"),
+        statBox("Items Sold", totalItems, "blue"),
+        statBox("Discount", `Rs ${discount}`, "amber")
     ].join("");
 
-    if (sales.length === 0) {
-        document.getElementById("report-list").innerHTML = `
-            <div class="p-8 text-center text-gray-400">
-                <div class="text-4xl mb-2">📊</div>
-                <div class="font-bold text-gray-600">No sales yet</div>
-                <div class="text-xs mt-1">Bills will appear here after Cash, Online, or Split payment.</div>
-            </div>`;
-        return;
-    }
+    document.getElementById("report-register").innerHTML = `
+        <div class="rounded-lg bg-gray-50 border border-gray-200 p-3"><div class="text-[11px] uppercase font-black text-gray-500">Cash</div><div class="text-xl font-black mt-1">Rs ${cash}</div></div>
+        <div class="rounded-lg bg-gray-50 border border-gray-200 p-3"><div class="text-[11px] uppercase font-black text-gray-500">Online</div><div class="text-xl font-black mt-1">Rs ${online}</div></div>
+        <div class="rounded-lg bg-gray-50 border border-gray-200 p-3"><div class="text-[11px] uppercase font-black text-gray-500">Dine In Bills</div><div class="text-xl font-black mt-1">${dineInBills}</div></div>
+        <div class="rounded-lg bg-gray-50 border border-gray-200 p-3"><div class="text-[11px] uppercase font-black text-gray-500">Parcel / Takeaway</div><div class="text-xl font-black mt-1">${parcelBills} / ${takeawayBills}</div></div>
+    `;
 
-    document.getElementById("report-list").innerHTML = sales.slice().reverse().map(s => {
-        const qty = (s.items || []).reduce((sum, item) => sum + (item.qty || 0), 0);
-        const modeClass = s.mode === "Cash" ? "bg-emerald-100 text-emerald-700" : s.mode === "Online" ? "bg-sky-100 text-sky-700" : "bg-orange-100 text-orange-700";
-        return `<div class="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] gap-2 px-4 py-3 text-sm items-center text-gray-800 hover:bg-gray-50">
-            <span class="font-semibold">${s.time}</span>
-            <span>${s.table}</span>
-            <span><span class="px-2 py-1 rounded-full text-[11px] font-black ${modeClass}">${s.mode}</span></span>
-            <span class="text-right font-bold">${qty}</span>
-            <span class="text-right font-black">₹${s.total}</span>
+    document.getElementById("top-items").innerHTML = topItems.length
+        ? topItems.slice(0, 8).map((item, index) => `
+            <div class="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-sm">
+                <div><span class="font-black text-gray-500 mr-2">${index + 1}.</span><span class="font-bold text-gray-900">${item.name}</span></div>
+                <div class="text-right"><div class="font-black">${item.qty}</div><div class="text-[11px] text-gray-500">Rs ${item.amount}</div></div>
+            </div>
+        `).join("")
+        : `<div class="text-sm text-gray-400">No sales found for this date.</div>`;
+
+    document.getElementById("category-summary").innerHTML = categories.length
+        ? categories.map(category => `
+            <div class="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-sm">
+                <div class="font-bold text-gray-900">${category.category}</div>
+                <div class="text-right"><div class="font-black">${category.qty} items</div><div class="text-[11px] text-gray-500">Rs ${category.amount}</div></div>
+            </div>
+        `).join("")
+        : `<div class="text-sm text-gray-400">No category movement for this date.</div>`;
+
+    document.getElementById("report-list").innerHTML = daySales.length
+        ? daySales.slice().reverse().map(sale => {
+            const qty = (sale.items || []).reduce((sum, item) => sum + (item.qty || 0), 0);
+            const label = sale.table === "P-1" ? "Parcel" : sale.table === "P-2" ? "Takeaway" : sale.table;
+            return `
+                <div class="grid grid-cols-[90px_90px_1fr_90px_110px] gap-2 px-4 py-3 text-sm items-center text-gray-800 hover:bg-gray-50">
+                    <span class="font-black">#${sale.billNo || "-"}</span>
+                    <span class="font-semibold">${sale.time}</span>
+                    <span>${label} <span class="text-xs text-gray-400">(${sale.mode})</span></span>
+                    <span class="text-right font-bold">${qty}</span>
+                    <span class="text-right font-black">Rs ${sale.total}</span>
+                </div>
+            `;
+        }).join("")
+        : `<div class="p-8 text-center text-gray-400">
+            <div class="text-4xl mb-2">📊</div>
+            <div class="font-bold text-gray-600">No sales for ${selectedDate}</div>
+            <div class="text-xs mt-1">Pick another date or start billing to build your report history.</div>
         </div>`;
-    }).join("");
 }
 
 function closeRegister() {
-    if (sales.length === 0) return alert("No sales to download");
-    let csv = "Date,Time,Table,Total,Cash,Online,Mode,Items\n";
-    sales.forEach(s => {
-        const itemText = (s.items || []).map(i => `${i.name} x${i.qty}`).join(" | ");
-        csv += `"${s.date}","${s.time}","${s.table}",${s.total},${s.cash || 0},${s.online || 0},"${s.mode}","${itemText}"\n`;
+    const selectedDate = getSelectedReportDate();
+    const daySales = getSalesForDate(selectedDate);
+    if (daySales.length === 0) return alert("No sales to download for selected date");
+    let csv = "Bill No,Date,Time,Table,Subtotal,Discount,Total,Cash,Online,Mode,Items\n";
+    daySales.forEach(s => {
+        const items = (s.items || []).map(i => `${i.name} x${i.qty}`).join(" | ");
+        csv += `"${s.billNo}","${s.date}","${s.time}","${s.table}",${s.subtotal || s.total},${s.discount || 0},${s.total},${s.cash || 0},${s.online || 0},"${s.mode}","${items}"\n`;
     });
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-    a.download = "Food-Mohalla-Sales-Report.csv";
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.download = `Food-Mohalla-Report-${selectedDate}.csv`;
     a.click();
-    sales = []; save(); renderReports();
+}
+
+function getBusinessDate() {
+    return new Date().toLocaleDateString("en-CA");
+}
+
+function getNextSerial(prefix) {
+    const today = getBusinessDate();
+    const dateKey = `fm_${prefix}_date`;
+    const numberKey = `fm_${prefix}_number`;
+    const lastDate = localStorage.getItem(dateKey);
+    let lastNumber = parseInt(localStorage.getItem(numberKey) || "0", 10);
+
+    if (lastDate !== today) lastNumber = 0;
+
+    const nextNumber = lastNumber + 1;
+    localStorage.setItem(dateKey, today);
+    localStorage.setItem(numberKey, String(nextNumber));
+    return nextNumber;
+}
+
+function getNextKotNumber() {
+    return getNextSerial("kot");
+}
+
+function getNextBillNumber() {
+    return getNextSerial("bill");
+}
+
+function getPendingKotItems(tableName = activeTable) {
+    return (tables[tableName] || [])
+        .map(item => {
+            const printedQty = item.kotPrintedQty || 0;
+            const pendingQty = item.qty - printedQty;
+            if (pendingQty <= 0) return null;
+            return { ...item, qty: pendingQty };
+        })
+        .filter(Boolean);
+}
+
+function getKotItemsToPrint(tableName = activeTable) {
+    return hasPrintedKot(tableName) ? getPendingKotItems(tableName) : (tables[tableName] || []).map(item => ({ ...item }));
+}
+
+function markKotPrinted(tableName = activeTable) {
+    tables[tableName] = (tables[tableName] || []).map(item => ({
+        ...item,
+        kotPrintedQty: item.qty
+    }));
 }
 
 function printReceipt(type, data) {
-    const cart = data ? data.items : tables[activeTable];
-    const total = data ? data.total : cart.reduce((s, i) => s + (i.price * i.qty), 0);
+    const kotPendingMode = type === "KOT" && hasPrintedKot(activeTable);
+    const cart = type === "KOT" ? getKotItemsToPrint(activeTable) : (data ? data.items : tables[activeTable]);
+    if (!cart.length) {
+        alert(type === "KOT" ? "No new items pending for KOT" : "Cart is empty");
+        return;
+    }
+
+    const subtotal = data ? (data.subtotal ?? data.total) : getCartSubtotal(activeTable);
+    const discount = data ? (data.discount || 0) : getTableDiscount(activeTable);
+    const total = data ? data.total : getCartTotal(activeTable);
     const receiptTable = data?.table || activeTable;
+    const receiptTableLabel = getReceiptTableLabel(receiptTable);
+    const orderTypeLabel = getOrderTypeLabel(receiptTable);
+    const now = new Date();
+    const printDate = data?.date || now.toLocaleDateString();
+    const printTime = data?.time || now.toLocaleTimeString();
+    const kotNumber = type === "KOT" ? getNextKotNumber() : null;
+    const billNumber = type === "BILL" ? (data?.billNo || getNextBillNumber()) : null;
+    const itemMarkup = cart.map((i, index) => `
+        <div class="item">
+            <span class="item-name">${type === "KOT" ? `${index + 1}. ${i.name}` : `${i.name} x${i.qty}`}</span>
+            ${type === "BILL" ? `<span class="item-value">Rs ${i.price * i.qty}</span>` : `<span class="item-value">x${i.qty}</span>`}
+        </div>
+    `).join("");
+
     const html = `
         <html>
         <head>
             <style>
+                @page {
+                    size: 80mm auto;
+                    margin: 6mm;
+                }
                 body {
-                    font-family: monospace;
+                    font-family: Arial, sans-serif;
                     width: 80mm;
-                    padding: 8px;
+                    padding: 0;
                     margin: 0;
-                    font-size: 16px;
-                    line-height: 1.5;
+                    font-size: ${type === "BILL" ? "15px" : "14px"};
+                    line-height: 1.4;
                     color: #000;
                 }
                 h3 {
                     margin: 0 0 8px;
                     text-align: center;
-                    font-size: 24px;
+                    font-size: ${type === "BILL" ? "24px" : "22px"};
+                    letter-spacing: 1px;
                 }
                 .label {
-                    font-size: 20px;
+                    font-size: ${type === "BILL" ? "18px" : "20px"};
                     font-weight: bold;
                     text-align: center;
                     margin: 8px 0;
                 }
-                .meta, .item, .total {
-                    margin: 6px 0;
+                .meta-wrap {
+                    margin: 8px 0;
+                    font-size: ${type === "BILL" ? "13px" : "14px"};
+                }
+                .meta-row {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 8px;
+                    margin: 2px 0;
+                }
+                .item, .total {
+                    margin: 8px 0;
                 }
                 .item {
                     display: flex;
                     justify-content: space-between;
                     gap: 8px;
+                    align-items: flex-start;
+                }
+                .item-name {
+                    flex: 1;
+                    font-weight: 700;
+                }
+                .item-value {
+                    min-width: 72px;
+                    text-align: right;
+                    font-weight: 700;
                 }
                 .total {
-                    font-size: 22px;
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 19px;
                     font-weight: bold;
                 }
                 hr {
@@ -485,29 +872,172 @@ function printReceipt(type, data) {
                     border-top: 1px dashed #000;
                     margin: 8px 0;
                 }
+                .center { text-align: center; }
+                .small { font-size: 12px; }
+                .bill-brand {
+                    text-align: center;
+                    margin-bottom: 8px;
+                }
+                .bill-brand-title {
+                    font-size: 26px;
+                    font-weight: 900;
+                    letter-spacing: 1px;
+                }
+                .bill-brand-sub {
+                    font-size: 12px;
+                    margin-top: 2px;
+                }
+                .bill-badge {
+                    text-align: center;
+                    font-size: 18px;
+                    font-weight: 800;
+                    border: 1px solid #000;
+                    padding: 6px 0;
+                    margin: 8px 0;
+                }
+                .bill-items .item {
+                    margin: 10px 0;
+                    font-size: 14px;
+                    align-items: center;
+                }
+                .bill-items .item-name {
+                    font-weight: 700;
+                }
+                .bill-summary {
+                    margin-top: 8px;
+                    border-top: 1px dashed #000;
+                    border-bottom: 1px dashed #000;
+                    padding: 8px 0;
+                }
+                .bill-summary .meta-row {
+                    font-size: 14px;
+                    margin: 4px 0;
+                }
+                .bill-grand-total {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-top: 10px;
+                    font-size: 22px;
+                    font-weight: 900;
+                }
+                .bill-footer {
+                    text-align: center;
+                    margin-top: 10px;
+                    font-size: 12px;
+                }
+                .kot-header {
+                    display: flex;
+                    justify-content: center;
+                    align-items: baseline;
+                    gap: 10px;
+                    font-weight: 800;
+                    font-size: 28px;
+                    margin: 0 0 8px;
+                }
+                .kot-number {
+                    font-size: 24px;
+                }
+                .kot-meta {
+                    margin: 8px 0;
+                    font-size: 14px;
+                    font-weight: 700;
+                }
+                .kot-meta-row {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin: 3px 0;
+                }
+                .kot-items {
+                    margin-top: 8px;
+                }
+                .kot-items .item {
+                    align-items: center;
+                    font-size: 18px;
+                    font-weight: 800;
+                    margin: 10px 0;
+                }
+                .kot-items .item-name {
+                    flex: 1;
+                }
+                .kot-items .item-value {
+                    min-width: 44px;
+                    text-align: left;
+                    font-size: 20px;
+                }
             </style>
         </head>
         <body>
-            <h3>FOOD MOHALLA</h3>
-            <hr>
-            <div class="label">${type}</div>
-            <div class="meta">Table: ${receiptTable}</div>
-            <hr>
-            ${cart.map(i => `<div class="item"><span>${i.name} x${i.qty}</span><span>Rs ${i.price * i.qty}</span></div>`).join("")}
-            <hr>
-            ${type === 'BILL' ? `<div class="total">TOTAL: Rs ${total}</div><div class="meta">Mode: ${data.mode}</div>` : ''}
+            ${type === "KOT" ? `
+                <div class="kot-header">
+                    <span>KOT</span>
+                    <span class="kot-number">#${kotNumber}</span>
+                </div>
+                <div class="kot-meta">
+                    <div class="kot-meta-row"><span>${orderTypeLabel}</span><span>${receiptTableLabel}</span></div>
+                    <div class="kot-meta-row"><span>${printDate}</span><span>${printTime}</span></div>
+                </div>
+                <hr>
+                <div class="kot-items">
+                    ${itemMarkup}
+                </div>
+            ` : `
+                <div class="bill-brand">
+                    <div class="bill-brand-title">FOOD MOHALLA</div>
+                    <div class="bill-brand-sub">Customer Copy</div>
+                </div>
+                <hr>
+                <div class="bill-badge">BILL</div>
+                <div class="meta-wrap">
+                    <div class="meta-row"><span>Bill No:</span><span>${billNumber}</span></div>
+                    <div class="meta-row"><span>${receiptTable === "P-1" || receiptTable === "P-2" ? "Type" : "Table"}:</span><span>${receiptTableLabel}</span></div>
+                    <div class="meta-row"><span>Date:</span><span>${printDate}</span></div>
+                    <div class="meta-row"><span>Time:</span><span>${printTime}</span></div>
+                </div>
+                <hr>
+                <div class="bill-items">
+                    ${itemMarkup}
+                </div>
+            `}
+            ${type === "BILL" ? `
+                <div class="bill-summary">
+                    <div class="meta-row"><span>Items:</span><span>${cart.reduce((sum, item) => sum + item.qty, 0)}</span></div>
+                    <div class="meta-row"><span>Subtotal:</span><span>Rs ${subtotal}</span></div>
+                    <div class="meta-row"><span>Discount:</span><span>Rs ${discount}</span></div>
+                </div>
+                <div class="bill-grand-total"><span>TOTAL</span><span>Rs ${total}</span></div>
+                <div class="meta-wrap">
+                    <div class="meta-row"><span>Payment:</span><span>${data.mode}</span></div>
+                    ${data.mode === "Split" ? `<div class="meta-row"><span>Cash / Online:</span><span>Rs ${data.cash} / Rs ${data.online}</span></div>` : ""}
+                </div>
+                <hr>
+                <div class="bill-footer">
+                    <div>Thank you for visiting</div>
+                    <div>Please visit again</div>
+                </div>
+            ` : ""}
         </body>
         </html>
     `;
+
     const f = document.getElementById("print-frame");
     f.contentWindow.document.open();
     f.contentWindow.document.write(html);
     f.contentWindow.document.close();
     f.contentWindow.focus();
     f.contentWindow.print();
+
+    if (type === "KOT") {
+        markKotPrinted(activeTable);
+        save();
+        renderCart();
+    }
 }
 
-window.onload = () => { if (sessionStorage.getItem("fm_auth") === "true") unlockApp(); };
+window.onload = () => {
+    if (sessionStorage.getItem("fm_auth") === "true") unlockApp();
+};
 </script>
 </body>
 </html>
